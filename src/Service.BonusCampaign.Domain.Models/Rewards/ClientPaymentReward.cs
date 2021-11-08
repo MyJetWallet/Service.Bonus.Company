@@ -10,7 +10,6 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         {
             { AmountParam, typeof(decimal).ToString() },
             { PaidAsset, typeof(string).ToString() },
-            { ClientId, typeof(string).ToString() },
         };
 
         public override Dictionary<string, string> Parameters { get; set; }

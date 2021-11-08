@@ -27,7 +27,7 @@ namespace Service.BonusCampaign.Grpc.Models
     [DataContract]
     public class AccessCriteriaGrpcModel
     {
-        [DataMember(Order = 1)] public static CriteriaType CriteriaType;
+        [DataMember(Order = 1)] public CriteriaType CriteriaType;
         [DataMember(Order = 2)] public Dictionary<string, string> Parameters { get; set; }
     }
     
@@ -78,6 +78,7 @@ namespace Service.BonusCampaign.Grpc.Models
         {
             return new AccessCriteriaGrpcModel
             {
+                CriteriaType = criteria.CriteriaType,
                 Parameters = criteria.Parameters
             };
         }

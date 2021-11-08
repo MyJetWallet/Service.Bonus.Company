@@ -9,8 +9,6 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
             { FeeShareGroup, typeof(string).ToString() },
-            { ReferrerId, typeof(string).ToString() },
-            { ClientId, typeof(string).ToString() },
         };
 
         public override Dictionary<string, string> Parameters { get; set; }
