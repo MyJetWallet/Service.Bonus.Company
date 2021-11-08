@@ -15,8 +15,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract List<RewardBase> Rewards { get; set; }
         public abstract ConditionStatus Status { get; set; }
         
-        public abstract Campaign Campaign { get; set; }
-        
         public abstract Dictionary<string, string> GetParams();
         public abstract Task<bool> Check();
 

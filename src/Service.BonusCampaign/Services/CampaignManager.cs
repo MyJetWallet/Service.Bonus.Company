@@ -34,12 +34,16 @@ namespace Service.BonusCampaign.Services
             var conditions = new List<ConditionBase>();
             try
             {
+                request.AccessCriteria ??= new ();
+                request.Conditions ??= new ();
+
                 criteriaList.AddRange(request.AccessCriteria.Select(criteriaRequest => AccessCriteriaFactory.CreateCriteria(criteriaRequest.Type, criteriaRequest.Parameters)));
 
-                conditions.AddRange(
+                if(request.Conditions.Any())
+                    conditions.AddRange(
                     from conditionRequest 
                         in request.Conditions 
-                    let rewards = conditionRequest.Rewards.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters)).ToList() 
+                    let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters)).ToList() ?? new List<RewardBase>()
                     select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId));
 
                 var campaign = new Campaign
@@ -56,11 +60,14 @@ namespace Service.BonusCampaign.Services
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
-                await context.UpsertAsync(new[] { campaign });
+                await context.Campaigns.AddAsync(campaign);
+                await context.SaveChangesAsync();
+
                 return new OperationResponse() { IsSuccess = true };
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "When creating campaign");
                 return new OperationResponse()
                 {
                     IsSuccess = false,
@@ -72,7 +79,11 @@ namespace Service.BonusCampaign.Services
         public async Task<GetAllCampaignsResponse> GetAllCampaigns()
         {
             await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var campaigns = context.Campaigns.Select(t => t.ToGrpcModel()).ToList();
+            var campaigns = context.Campaigns
+                .Include(t=>t.CriteriaList)
+                .Include(t=>t.Conditions)
+                .ThenInclude(t=>t.Rewards)
+                .Select(t => t.ToGrpcModel()).ToList();
             return new GetAllCampaignsResponse
             {
                 Campaigns = campaigns

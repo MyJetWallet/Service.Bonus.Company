@@ -77,7 +77,8 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<AccessCriteriaBase>().Property(e => e.Parameters).HasColumnType("jsonb");
             modelBuilder.Entity<AccessCriteriaBase>().HasDiscriminator(e => e.CriteriaType)
                 .HasValue<KycCriteria>(CriteriaType.KycType);
-            
+            modelBuilder.Entity<KycCriteria>().HasBaseType<AccessCriteriaBase>();
+
             modelBuilder.Entity<AccessCriteriaBase>().HasOne<Campaign>().WithMany(t => t.CriteriaList).HasForeignKey(t=>t.CampaignId);
             
             // modelBuilder.Entity<AccessCriteriaBase>().HasIndex(e => e.IsEnabled);
@@ -94,7 +95,8 @@ namespace Service.BonusCampaign.Postgres
 
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition);
-
+            modelBuilder.Entity<KycCondition>().HasBaseType<ConditionBase>();
+            
             modelBuilder.Entity<ConditionBase>().HasOne<Campaign>().WithMany(t => t.Conditions).HasForeignKey(t=>t.CampaignId);
 
         }
@@ -108,6 +110,10 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<RewardBase>().HasDiscriminator(e => e.Type)
                 .HasValue<FeeShareReward>(RewardType.FeeShareAssignment)
                 .HasValue<ClientPaymentReward>(RewardType.ClientPaymentAbsolute);
+            
+            modelBuilder.Entity<FeeShareReward>().HasBaseType<RewardBase>();
+            modelBuilder.Entity<ClientPaymentReward>().HasBaseType<RewardBase>();
+
             
             modelBuilder.Entity<RewardBase>().HasOne<ConditionBase>().WithMany(t => t.Rewards).HasForeignKey(t=>t.ConditionId);
 

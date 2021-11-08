@@ -92,8 +92,8 @@ namespace Service.BonusCampaign.Grpc.Models
                 IsEnabled = campaign.IsEnabled,
                 Status = campaign.Status,
                 BannerId = campaign.BannerId,
-                CriteriaList = campaign.CriteriaList.Select(ToGrpcModel).ToList(),
-                Conditions = campaign.Conditions.Select(ToGrpcModel).ToList()
+                CriteriaList = campaign.CriteriaList?.Select(ToGrpcModel).ToList() ?? new (),
+                Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new ()
             };
         }
     }

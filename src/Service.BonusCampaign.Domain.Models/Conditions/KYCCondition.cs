@@ -16,7 +16,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override Dictionary<string, string> Parameters { get; set; }
         public override List<RewardBase> Rewards { get; set; }
         public override ConditionStatus Status { get; set; }
-        public override Campaign Campaign { get; set; }
 
         public KycCondition()
         {
