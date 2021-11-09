@@ -29,6 +29,8 @@ namespace Service.BonusCampaign.Grpc.Models
     {
         [DataMember(Order = 1)] public CriteriaType CriteriaType;
         [DataMember(Order = 2)] public Dictionary<string, string> Parameters { get; set; }
+        [DataMember(Order = 3)] public string CriteriaId { get; set; }
+
     }
     
     [DataContract]
@@ -39,6 +41,8 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 3)] public Dictionary<string, string> Parameters { get; set; }
         [DataMember(Order = 4)] public List<RewardGrpcModel> Rewards { get; set; }
         [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
+        [DataMember(Order = 6)] public string ConditionId { get; set; }
+
     }
     
     [DataContract]
@@ -66,6 +70,7 @@ namespace Service.BonusCampaign.Grpc.Models
         {
             return new ConditionGrpcModel
             {
+                ConditionId = conditionBase.ConditionId,
                 CampaignId = conditionBase.CampaignId,
                 Type = conditionBase.Type,
                 Parameters = conditionBase.Parameters,
@@ -78,6 +83,7 @@ namespace Service.BonusCampaign.Grpc.Models
         {
             return new AccessCriteriaGrpcModel
             {
+                CriteriaId = criteria.CriteriaId,
                 CriteriaType = criteria.CriteriaType,
                 Parameters = criteria.Parameters
             };
