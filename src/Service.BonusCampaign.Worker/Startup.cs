@@ -23,7 +23,7 @@ namespace Service.BonusCampaign.Worker
 
             services.AddHostedService<ApplicationLifetimeManager>();
             DatabaseContext.LoggerFactory = Program.LogFactory;
-            services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString,
+            services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString.Replace("Ssl Mode=Require", "Ssl Mode=VerifyFull"),
                 o => new DatabaseContext(o));
             DatabaseContext.LoggerFactory = null;
             services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);
