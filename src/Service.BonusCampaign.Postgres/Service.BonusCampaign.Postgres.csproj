@@ -6,7 +6,7 @@
 
 
     <ItemGroup>
-        <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.0.0" />
+        <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="6.0.0-preview5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
