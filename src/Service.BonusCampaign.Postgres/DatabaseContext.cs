@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -125,6 +126,20 @@ namespace Service.BonusCampaign.Postgres
             var result = await Campaigns.UpsertRange(entities).AllowIdentityMatch().RunAsync();
             return result;
         }
-        
+        public async Task<int> UpsertAsync(IEnumerable<AccessCriteriaBase> entities)
+        {
+            var result = await Criteria.UpsertRange(entities).AllowIdentityMatch().RunAsync();
+            return result;
+        }        
+        public async Task<int> UpsertAsync(IEnumerable<ConditionBase> entities)
+        {
+            var result = await Conditions.UpsertRange(entities).AllowIdentityMatch().RunAsync();
+            return result;
+        }        
+        public async Task<int> UpsertAsync(IEnumerable<RewardBase> entities)
+        {
+            var result = await Rewards.UpsertRange(entities).AllowIdentityMatch().RunAsync();
+            return result;
+        }
     }
 }

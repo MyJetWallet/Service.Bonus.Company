@@ -7,12 +7,12 @@ namespace Service.BonusCampaign.Domain
 {
     public class AccessCriteriaFactory
     {
-        public static AccessCriteriaBase CreateCriteria(CriteriaType type, Dictionary<string, string> parameters, string criteriaID)
+        public static AccessCriteriaBase CreateCriteria(CriteriaType type, Dictionary<string, string> parameters, string criteriaID, string campaignId)
         {
             switch (type)
             {
                 case CriteriaType.KycType:
-                    return new KycCriteria(parameters, criteriaID);
+                    return new KycCriteria(parameters, criteriaID, campaignId);
                 case CriteriaType.RegistrationType:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

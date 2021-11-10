@@ -17,8 +17,10 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override string ConditionId { get; set; }
         public override RewardType Type { get; set; }
         
-        public ClientPaymentReward(Dictionary<string, string> parameters, string rewardId)
-        {            
+        public ClientPaymentReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
+        {
+            Type = RewardType.ClientPaymentAbsolute;
+            ConditionId = conditionId;
             RewardId = rewardId ?? Guid.NewGuid().ToString("N");
             Parameters = parameters;
         }

@@ -37,13 +37,13 @@ namespace Service.BonusCampaign.Services
                 request.CriteriaList ??= new ();
                 request.Conditions ??= new ();
 
-                criteriaList.AddRange(request.CriteriaList.Select(criteriaRequest => AccessCriteriaFactory.CreateCriteria(criteriaRequest.CriteriaType, criteriaRequest.Parameters, criteriaRequest.CriteriaId)));
+                criteriaList.AddRange(request.CriteriaList.Select(criteriaRequest => AccessCriteriaFactory.CreateCriteria(criteriaRequest.CriteriaType, criteriaRequest.Parameters, criteriaRequest.CriteriaId, campaignId)));
 
                 if(request.Conditions.Any())
                     conditions.AddRange(
                     from conditionRequest 
                         in request.Conditions 
-                    let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters, rewardRequest.RewardId)).ToList() ?? new List<RewardBase>()
+                    let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters, rewardRequest.RewardId, conditionRequest.ConditionId)).ToList() ?? new List<RewardBase>()
                     select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId, conditionRequest.ConditionId));
 
                 var campaign = new Campaign
@@ -60,8 +60,12 @@ namespace Service.BonusCampaign.Services
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
-                await context.Campaigns.AddAsync(campaign);
-                await context.SaveChangesAsync();
+
+                await context.UpsertAsync(new[] { campaign });
+                await context.UpsertAsync(campaign.CriteriaList);
+                await context.UpsertAsync(campaign.Conditions);
+                await context.UpsertAsync(campaign.Conditions.SelectMany(t=>t.Rewards));
+
 
                 return new OperationResponse() { IsSuccess = true };
             }

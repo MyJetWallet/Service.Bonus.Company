@@ -14,10 +14,10 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override CriteriaType CriteriaType { get; set; }
         public override Dictionary<string, string> Parameters { get; set; }
 
-        public KycCriteria(Dictionary<string, string> parameters, string criteriaId) : base(parameters)
+        public KycCriteria(Dictionary<string, string> parameters, string criteriaId, string campaignId) : base(parameters)
         {
             CriteriaId = criteriaId ?? Guid.NewGuid().ToString("N");
-            
+            CampaignId = campaignId;
             CriteriaType = CriteriaType.KycType;
             Parameters = parameters;
             if (!parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))

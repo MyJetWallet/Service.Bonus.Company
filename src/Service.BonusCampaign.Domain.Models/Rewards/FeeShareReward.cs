@@ -17,8 +17,10 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override RewardType Type { get; set; }
         public override Dictionary<string, string> GetParams() => ParamDictionary;
 
-        public FeeShareReward(Dictionary<string, string> parameters, string rewardId)
+        public FeeShareReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
         {
+            Type = RewardType.FeeShareAssignment;
+            ConditionId = conditionId;
             RewardId = rewardId ?? Guid.NewGuid().ToString("N");
             Parameters = parameters;
         }
