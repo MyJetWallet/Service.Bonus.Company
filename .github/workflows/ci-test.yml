@@ -31,13 +31,19 @@ jobs:
     - name: ls
       run: ls
 
-    - name: Publish Service
+    - name: Publish Service API
       run: dotnet publish --no-build ./src/Service.BonusCampaign/Service.BonusCampaign.csproj --configuration Release --output ./publish-api
+ 
+    - name: Publish Service Worker
+      run: dotnet publish --no-build ./src/Service.BonusCampaign.Worker/Service.BonusCampaign.Worker.csproj --configuration Release --output ./publish-worker
 
-    - name: Check Service dir
+    - name: Check Service dir API
       run: ls ./publish-api
-      
-    - name: Publish image
+    
+    - name: Check Service dir Worker
+      run: ls ./publish-worker
+            
+    - name: Publish image API
       uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
@@ -48,7 +54,18 @@ jobs:
         tags: latest
         build_args: app_version=myjetwallet.service.bonuscampaign-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
-    - name: Publish image ST
+    - name: Publish image Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        path: ./publish-worker
+        registry: docker.pkg.github.com
+        repository: ${{ secrets.ORG_NAME }}/service.bonuscampaign/myjetwallet.service.bonuscampaign.worker-test
+        tags: latest
+        build_args: app_version=myjetwallet.service.bonuscampaign.worker-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image ST API
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.ST_DOCKER_USER }}
@@ -59,6 +76,18 @@ jobs:
         tags: latest
         add_git_labels: true
         build_args: app_version=myjetwallet.service.bonuscampaign-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image ST Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.ST_DOCKER_USER }}
+        password: ${{ secrets.ST_DOCKER_PASSWORD }}
+        path: ./publish-worker
+        registry: simpletrading.azurecr.io
+        repository: spot/myjetwallet.service.bonuscampaign.worker-test
+        tags: latest
+        add_git_labels: true
+        build_args: app_version=myjetwallet.service.bonuscampaign.worker-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
   restart:
     runs-on: self-hosted   
@@ -71,4 +100,10 @@ jobs:
         NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
         POD: bonuscampaign
 
+    - name: Restart Worker
+      uses: Myjetwallet/kube-restart-pods@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
+        NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
+        POD: bonuscampaign-worker
 

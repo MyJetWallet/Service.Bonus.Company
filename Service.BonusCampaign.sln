@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BonusCampaign.Domai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BonusCampaign.Postgres", "src\Service.BonusCampaign.Postgres\Service.BonusCampaign.Postgres.csproj", "{10A5EA55-0F2F-4A8B-80C7-75490E77C634}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BonusCampaign.Worker", "src\Service.BonusCampaign.Worker\Service.BonusCampaign.Worker.csproj", "{5AFFC002-A88D-4A60-ACE6-0EFBAEFFA521}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{10A5EA55-0F2F-4A8B-80C7-75490E77C634}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10A5EA55-0F2F-4A8B-80C7-75490E77C634}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10A5EA55-0F2F-4A8B-80C7-75490E77C634}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AFFC002-A88D-4A60-ACE6-0EFBAEFFA521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AFFC002-A88D-4A60-ACE6-0EFBAEFFA521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AFFC002-A88D-4A60-ACE6-0EFBAEFFA521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AFFC002-A88D-4A60-ACE6-0EFBAEFFA521}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

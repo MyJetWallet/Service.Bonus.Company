@@ -13,3 +13,10 @@ jobs:
         KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
         NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
         POD: bonuscampaign
+
+    - name: Restart service
+      uses: Myjetwallet/kube-restart-pods@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
+        NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
+        POD: bonuscampaign-worker

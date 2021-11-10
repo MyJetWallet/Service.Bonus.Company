@@ -30,18 +30,24 @@ jobs:
     - name: ls
       run: ls
 
-    - name: Publish Service
+    - name: Publish Service API
       run: dotnet publish ./src/Service.BonusCampaign/Service.BonusCampaign.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
 
-    - name: Check Service dir
+    - name: Check Service dir API
       run: ls ./publish-api
 
-    - name: Extract branch name
+    - name: Publish Service Worker
+      run: dotnet publish ./src/Service.BonusCampaign/Service.BonusCampaign.Worker.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-worker
+
+    - name: Check Service dir Worker
+      run: ls ./publish-worker
+
+    - name: Extract branch name 
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
       id: extract_branch
 
-    - name: Publish image
+    - name: Publish image API
       uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
@@ -52,7 +58,18 @@ jobs:
         tag_with_ref: true
         build_args: app_version=myjetwallet.service.bonuscampaign:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
-    - name: Publish image ST
+    - name: Publish image Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        path: ./publish-api
+        registry: docker.pkg.github.com
+        repository: ${{ secrets.ORG_NAME }}/service.bonuscampaign/myjetwallet.service.bonuscampaign
+        tag_with_ref: true
+        build_args: app_version=myjetwallet.service.bonuscampaign.worker:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+    
+    - name: Publish image ST API
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.ST_DOCKER_USER }}
@@ -62,6 +79,17 @@ jobs:
         repository: spot/myjetwallet.service.bonuscampaign
         tag_with_ref: true
         build_args: app_version=myjetwallet.service.bonuscampaign:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image ST Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.ST_DOCKER_USER }}
+        password: ${{ secrets.ST_DOCKER_PASSWORD }}
+        path: ./publish-api
+        registry: simpletrading.azurecr.io
+        repository: spot/myjetwallet.service.bonuscampaign
+        tag_with_ref: true
+        build_args: app_version=myjetwallet.service.bonuscampaign.worker:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
   update_version:
     needs: build
@@ -76,6 +104,11 @@ jobs:
     - run: |
         pattern=myjetwallet.service.bonuscampaign:.*$
         imagename=myjetwallet.service.bonuscampaign:${GITHUB_REF#refs/tags/}
+        reg=$"s/${pattern}/${imagename}/g"
+        echo $reg
+        find . -type f -name "deployment.*" -print0 -exec sed -i -r $reg {} \;
+        pattern=myjetwallet.service.bonuscampaign.worker:.*$
+        imagename=myjetwallet.service.bonuscampaign.worker:${GITHUB_REF#refs/tags/}
         reg=$"s/${pattern}/${imagename}/g"
         echo $reg
         find . -type f -name "deployment.*" -print0 -exec sed -i -r $reg {} \;
