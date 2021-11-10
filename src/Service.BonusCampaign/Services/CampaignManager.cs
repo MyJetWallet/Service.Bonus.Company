@@ -27,29 +27,29 @@ namespace Service.BonusCampaign.Services
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
 
-        public async Task<OperationResponse> CreateCampaign(CreateCampaignRequest request)
+        public async Task<OperationResponse> CreateOrUpdateCampaign(CampaignGrpcModel request)
         {
-            var campaignId = Guid.NewGuid().ToString("N");
+            var campaignId = request.Id ?? Guid.NewGuid().ToString("N");
             var criteriaList = new List<AccessCriteriaBase>();
             var conditions = new List<ConditionBase>();
             try
             {
-                request.AccessCriteria ??= new ();
+                request.CriteriaList ??= new ();
                 request.Conditions ??= new ();
 
-                criteriaList.AddRange(request.AccessCriteria.Select(criteriaRequest => AccessCriteriaFactory.CreateCriteria(criteriaRequest.Type, criteriaRequest.Parameters)));
+                criteriaList.AddRange(request.CriteriaList.Select(criteriaRequest => AccessCriteriaFactory.CreateCriteria(criteriaRequest.CriteriaType, criteriaRequest.Parameters, criteriaRequest.CriteriaId)));
 
                 if(request.Conditions.Any())
                     conditions.AddRange(
                     from conditionRequest 
                         in request.Conditions 
-                    let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters)).ToList() ?? new List<RewardBase>()
-                    select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId));
+                    let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters, rewardRequest.RewardId)).ToList() ?? new List<RewardBase>()
+                    select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId, conditionRequest.ConditionId));
 
                 var campaign = new Campaign
                 {
                     Id = campaignId,
-                    Name = request.CampaignName,
+                    Name = request.Name,
                     FromDateTime = request.FromDateTime,
                     ToDateTime = request.ToDateTime,
                     IsEnabled = request.IsEnabled,

@@ -14,9 +14,9 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override CriteriaType CriteriaType { get; set; }
         public override Dictionary<string, string> Parameters { get; set; }
 
-        public KycCriteria(Dictionary<string, string> parameters) : base(parameters)
+        public KycCriteria(Dictionary<string, string> parameters, string criteriaId) : base(parameters)
         {
-            CriteriaId = Guid.NewGuid().ToString("N");
+            CriteriaId = criteriaId ?? Guid.NewGuid().ToString("N");
             
             CriteriaType = CriteriaType.KycType;
             Parameters = parameters;

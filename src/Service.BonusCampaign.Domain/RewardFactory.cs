@@ -7,14 +7,14 @@ namespace Service.BonusCampaign.Domain
 {
     public static class RewardFactory
     {
-        public static RewardBase CreateReward(RewardType type, Dictionary<string, string> parameters)
+        public static RewardBase CreateReward(RewardType type, Dictionary<string, string> parameters, string rewardId)
         {
             switch (type)
             {
                 case RewardType.FeeShareAssignment:
-                    return new FeeShareReward(parameters);
+                    return new FeeShareReward(parameters, rewardId);
                 case RewardType.ClientPaymentAbsolute:
-                    return new ClientPaymentReward(parameters);
+                    return new ClientPaymentReward(parameters, rewardId);
                 case RewardType.ReferrerPaymentAbsolute:
                 case RewardType.ReferrerPaymentRelative:
                 case RewardType.ClientPaymentRelative:

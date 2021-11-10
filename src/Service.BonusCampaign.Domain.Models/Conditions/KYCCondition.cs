@@ -20,10 +20,10 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public KycCondition()
         {
         }
-        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards)
+        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId)
         {
             Type = ConditionType.KYCCondition;
-            ConditionId = Guid.NewGuid().ToString("N");
+            ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
             
             CampaignId = campaignId;
             EventTypes = new List<EventType>() { EventType.KYCPassed };

@@ -10,12 +10,12 @@ namespace Service.BonusCampaign.Domain
 {
     public static class ConditionFactory
     {
-        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId)
+        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId)
         {
             switch (type)
             {
                 case ConditionType.KYCCondition:
-                    return new KycCondition(campaignId, parameters, rewards);
+                    return new KycCondition(campaignId, parameters, rewards, conditionId);
                 case ConditionType.TradeCondition:
                 case ConditionType.ReferralCondition:
                 default:

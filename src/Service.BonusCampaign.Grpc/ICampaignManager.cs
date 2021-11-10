@@ -8,7 +8,7 @@ namespace Service.BonusCampaign.Grpc
     public interface ICampaignManager
     {
         [OperationContract]
-        Task<OperationResponse> CreateCampaign(CreateCampaignRequest request);
+        Task<OperationResponse> CreateOrUpdateCampaign(CampaignGrpcModel request);
         
         [OperationContract]
         Task<GetAllCampaignsResponse> GetAllCampaigns();
