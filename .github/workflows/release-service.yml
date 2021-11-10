@@ -37,7 +37,7 @@ jobs:
       run: ls ./publish-api
 
     - name: Publish Service Worker
-      run: dotnet publish ./src/Service.BonusCampaign/Service.BonusCampaign.Worker.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-worker
+      run: dotnet publish ./src/Service.BonusCampaign.Worker/Service.BonusCampaign.Worker.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-worker
 
     - name: Check Service dir Worker
       run: ls ./publish-worker
