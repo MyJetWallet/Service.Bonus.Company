@@ -1,27 +1,31 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
+using MyJetWallet.Sdk.ServiceBus;
 
 namespace Service.BonusCampaign.Worker
 {
     public class ApplicationLifetimeManager : ApplicationLifetimeManagerBase
     {
         private readonly ILogger<ApplicationLifetimeManager> _logger;
-
-        public ApplicationLifetimeManager(IHostApplicationLifetime appLifetime, ILogger<ApplicationLifetimeManager> logger)
+        private readonly ServiceBusLifeTime _serviceBusLifeTime;
+        public ApplicationLifetimeManager(IHostApplicationLifetime appLifetime, ILogger<ApplicationLifetimeManager> logger, ServiceBusLifeTime serviceBusLifeTime)
             : base(appLifetime)
         {
             _logger = logger;
+            _serviceBusLifeTime = serviceBusLifeTime;
         }
 
         protected override void OnStarted()
         {
             _logger.LogInformation("OnStarted has been called.");
+            _serviceBusLifeTime.Start();;
         }
 
         protected override void OnStopping()
         {
             _logger.LogInformation("OnStopping has been called.");
+            _serviceBusLifeTime.Stop();
         }
 
         protected override void OnStopped()

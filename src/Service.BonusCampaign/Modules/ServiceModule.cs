@@ -8,7 +8,7 @@ namespace Service.BonusCampaign.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            
+
         }
     }
 }

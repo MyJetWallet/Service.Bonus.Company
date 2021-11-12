@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Criteria;
+using Service.BonusClientContext.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models
 {
@@ -16,5 +17,7 @@ namespace Service.BonusCampaign.Domain.Models
         public string BannerId { get; set; }
         public List<AccessCriteriaBase> CriteriaList { get; set; }
         public List<ConditionBase> Conditions { get; set; }
+        
+        public Dictionary<string, CampaignClientContext> CampaignClientContexts { get; set; }
     }
 }

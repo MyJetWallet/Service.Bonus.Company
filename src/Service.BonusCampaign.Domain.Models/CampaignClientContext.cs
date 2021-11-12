@@ -10,6 +10,6 @@ namespace Service.BonusCampaign.Domain.Models
         public string CampaignId { get; set; }
         public DateTime ActivationTime { get; set; }
         public CampaignStatus Status { get; set; }
-        public Dictionary<ConditionStatus, ConditionBase> Conditions { get; set; }
+        public Dictionary<string, ConditionStatus> Conditions { get; set; }
     }
 }

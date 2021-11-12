@@ -1,4 +1,8 @@
 ﻿using Autofac;
+using MyJetWallet.Sdk.ServiceBus;
+using MyServiceBus.Abstractions;
+using Service.BonusCampaign.Worker.Jobs;
+using Service.BonusClientContext.Domain.Models;
 
 namespace Service.BonusCampaign.Worker.Modules
 {
@@ -6,7 +10,16 @@ namespace Service.BonusCampaign.Worker.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            var queueName = "Service.Bonus.Campaign-Worker";
+
+            var spotServiceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), Program.LogFactory);
+            builder.RegisterMyServiceBusSubscriberSingle<ContextUpdate>(spotServiceBusClient,
+                ContextUpdate.TopicName, queueName, TopicQueueType.PermanentWithSingleConnection);
             
+            
+            builder.RegisterType<ConditionCheckerJob>().AsSelf().AutoActivate().SingleInstance();
+            builder.RegisterType<PaymentJob>().AsSelf().AutoActivate().SingleInstance();
+            builder.RegisterType<CriteriaCheckerJob>().AsSelf().AutoActivate().SingleInstance();
         }
     }
 }

@@ -16,5 +16,8 @@ namespace Service.BonusCampaign.Worker.Settings
         
         [YamlProperty("BonusCampaign.PostgresConnectionString")]
         public string PostgresConnectionString { get; set; }        
+        
+        [YamlProperty("BonusCampaign.SpotServiceBusHostPort")]
+        public string SpotServiceBusHostPort { get; set; }
     }
 }
