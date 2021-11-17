@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Service.BonusCampaign.Domain.Models;
+using Service.BonusCampaign.Domain.Models.Context;
 
 #nullable disable
 

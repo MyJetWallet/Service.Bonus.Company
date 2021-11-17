@@ -16,10 +16,11 @@ namespace Service.BonusCampaign.Worker.Modules
             builder.RegisterMyServiceBusSubscriberSingle<ContextUpdate>(spotServiceBusClient,
                 ContextUpdate.TopicName, queueName, TopicQueueType.PermanentWithSingleConnection);
             
+            builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             
             builder.RegisterType<ConditionCheckerJob>().AsSelf().AutoActivate().SingleInstance();
-            builder.RegisterType<PaymentJob>().AsSelf().AutoActivate().SingleInstance();
-            builder.RegisterType<CriteriaCheckerJob>().AsSelf().AutoActivate().SingleInstance();
+            
         }
     }
 }

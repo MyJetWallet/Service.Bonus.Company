@@ -34,6 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Service.BonusCampaign.Domain\Service.BonusCampaign.Domain.csproj" />
       <ProjectReference Include="..\Service.BonusCampaign.Postgres\Service.BonusCampaign.Postgres.csproj" />
     </ItemGroup>
 

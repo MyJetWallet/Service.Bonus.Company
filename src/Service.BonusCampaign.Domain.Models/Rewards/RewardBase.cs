@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Enums;
+using Service.BonusClientContext.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Rewards
 {
@@ -17,5 +20,6 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
 
         public abstract RewardType Type { get; set; }
         public abstract Dictionary<string, string> GetParams();
+        public abstract Task ExecuteReward(ContextUpdate context);
     }
 }

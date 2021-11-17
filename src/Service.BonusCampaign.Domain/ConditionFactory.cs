@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Criteria;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 

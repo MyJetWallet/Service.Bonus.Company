@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Enums;
 
-namespace Service.BonusCampaign.Domain.Models
+namespace Service.BonusCampaign.Domain.Models.Context
 {
     public class CampaignClientContext
     {
@@ -10,6 +10,9 @@ namespace Service.BonusCampaign.Domain.Models
         public string CampaignId { get; set; }
         public DateTime ActivationTime { get; set; }
         public CampaignStatus Status { get; set; }
-        public Dictionary<string, ConditionStatus> Conditions { get; set; }
+        public List<ClientConditionState> Conditions { get; set; }
+        
     }
+
+
 }

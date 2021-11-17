@@ -4,14 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Postgres;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 
 namespace Service.BonusCampaign.Postgres
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : MyDbContext
     {
         public const string Schema = "bonuscampaign";
 
@@ -19,7 +22,8 @@ namespace Service.BonusCampaign.Postgres
         public const string CriteriaTableName = "criteria";
         public const string ConditionTableName = "conditions";
         public const string RewardTableName = "rewards";
-
+        public const string CampaignClientContextTableName = "campaigncontexts";
+        public const string ConditionStateTableName = "conditionstates";
         public DbSet<Campaign> Campaigns { get; set; }
         
         public DbSet<AccessCriteriaBase> Criteria { get; set; }
@@ -32,20 +36,12 @@ namespace Service.BonusCampaign.Postgres
         public DbSet<FeeShareReward> FeeShareRewards { get; set; }
         public DbSet<ClientPaymentReward> ClientPaymentRewards { get; set; }
 
+        public DbSet<CampaignClientContext> CampaignClientContexts { get; set; }
+        public DbSet<ClientConditionState> ConditionStates { get; set; }
         public DatabaseContext(DbContextOptions options) : base(options)
         {
         }
-
-        public static ILoggerFactory LoggerFactory { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (LoggerFactory != null)
-            {
-                optionsBuilder.UseLoggerFactory(LoggerFactory).EnableSensitiveDataLogging();
-            }
-        }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {           
             modelBuilder.HasDefaultSchema(Schema);
@@ -53,6 +49,8 @@ namespace Service.BonusCampaign.Postgres
             SetConditions(modelBuilder);
             SetCriteria(modelBuilder);
             SetRewards(modelBuilder);
+            SetContexts(modelBuilder);
+            SetConditionStates(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
 
@@ -66,7 +64,6 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<Campaign>().Property(e => e.BannerId).HasMaxLength(128);
             modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime).HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));;
             modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime).HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));;
-            modelBuilder.Entity<Campaign>().Property(e => e.CampaignClientContexts).HasColumnType("jsonb");
 
             modelBuilder.Entity<Campaign>().HasIndex(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().HasIndex(e => e.FromDateTime);
@@ -122,7 +119,29 @@ namespace Service.BonusCampaign.Postgres
 
 
         }
+        
+        private void SetContexts(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CampaignClientContext>().ToTable(CampaignClientContextTableName);
+            modelBuilder.Entity<CampaignClientContext>().HasKey(e => new{ e.ClientId, e.CampaignId});
+            modelBuilder.Entity<CampaignClientContext>().Property(e => e.CampaignId).HasMaxLength(128);
+            //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
+            
+            modelBuilder.Entity<CampaignClientContext>().HasOne<Campaign>().WithMany(t => t.CampaignClientContexts).HasForeignKey(t=>t.CampaignId);
+        }
 
+        private void SetConditionStates(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClientConditionState>().ToTable(ConditionStateTableName);
+            modelBuilder.Entity<ClientConditionState>().HasKey(e => new { e.ClientId, e.ConditionId});
+            modelBuilder.Entity<ClientConditionState>().Property(e => e.ClientId).HasMaxLength(128);
+            modelBuilder.Entity<ClientConditionState>().Property(e => e.ConditionId).HasMaxLength(128);
+
+            //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
+            
+            modelBuilder.Entity<ClientConditionState>().HasOne<CampaignClientContext>().WithMany(t => t.Conditions).HasForeignKey(t=>new {t.ClientId, t.ConditionId});
+        }
+        
         public async Task<int> UpsertAsync(IEnumerable<Campaign> entities)
         {
             var result = await Campaigns.UpsertRange(entities).AllowIdentityMatch().RunAsync();
@@ -141,6 +160,12 @@ namespace Service.BonusCampaign.Postgres
         public async Task<int> UpsertAsync(IEnumerable<RewardBase> entities)
         {
             var result = await Rewards.UpsertRange(entities).AllowIdentityMatch().RunAsync();
+            return result;
+        }
+        
+        public async Task<int> UpsertAsync(IEnumerable<CampaignClientContext> entities)
+        {
+            var result = await CampaignClientContexts.UpsertRange(entities).AllowIdentityMatch().RunAsync();
             return result;
         }
     }

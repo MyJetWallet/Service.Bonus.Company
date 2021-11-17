@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Enums;
+using Service.BonusClientContext.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Rewards
 {
@@ -16,6 +19,10 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override string ConditionId { get; set; }
         public override RewardType Type { get; set; }
         public override Dictionary<string, string> GetParams() => ParamDictionary;
+        public override async Task ExecuteReward(ContextUpdate context)
+        {
+            throw new NotImplementedException();
+        }
 
         public FeeShareReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
         {

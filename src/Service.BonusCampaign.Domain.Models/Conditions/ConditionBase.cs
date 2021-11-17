@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 
@@ -16,7 +17,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract ConditionStatus Status { get; set; }
         
         public abstract Dictionary<string, string> GetParams();
-        public abstract Task<bool> Check();
+        public abstract Task<bool> Check(ContextUpdate context);
 
     }
 }

@@ -1,4 +1,4 @@
-namespace Service.BonusCampaign.Domain.Models.Conditions
+namespace Service.BonusCampaign.Domain.Models.Enums
 {
     public enum ConditionType
     {

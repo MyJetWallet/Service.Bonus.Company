@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 
@@ -38,8 +39,20 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check() => true;
-        
+        public override async Task<bool> Check(ContextUpdate context)
+        {
+            if (context.KycEvent != null && context.KycEvent.KycPassed)
+            {
+                foreach (var reward in Rewards)
+                {
+                    await reward.ExecuteReward(context);
+                }
+                return true;
+            }
+            
+            return false;
+        }
+
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
             { KycParam, typeof(bool).ToString() },

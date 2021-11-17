@@ -1,4 +1,4 @@
-namespace Service.BonusCampaign.Domain.Models
+namespace Service.BonusCampaign.Domain.Models.Enums
 {
     public enum CampaignStatus
     {

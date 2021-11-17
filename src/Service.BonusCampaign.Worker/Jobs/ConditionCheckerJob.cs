@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
+using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Context;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
 using Service.BonusClientContext.Domain.Models;
 
@@ -13,57 +16,84 @@ namespace Service.BonusCampaign.Worker.Jobs
     public class ConditionCheckerJob
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
-
-        public ConditionCheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        private readonly CampaignClientContextRepository _contextRepository;
+        private readonly CampaignRepository _campaignRepository;
+        public ConditionCheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            _contextRepository = contextRepository;
+            _campaignRepository = campaignRepository;
             subscriber.Subscribe(HandleUpdates);
         }
 
         private async ValueTask HandleUpdates(ContextUpdate update)
         {
-            switch (update.EventType)
-            {
-                case EventType.ClientRegistered:
-                    break;
-                case EventType.KYCPassed:
-                    await HandleKycUpdates(update);
-                    break;
-                case EventType.ReferrerAdded:
-                    break;
-                case EventType.DepositMade:
-                    break;
-                case EventType.TradeMade:
-                    break;
-                case EventType.WithdrawalMade:
-                    break;
-                default:
-                    break;
-            }
+            await HandleCriteriaChecks(update);
+            await HandleConditionChecks(update);
         }
 
-        private async Task HandleKycUpdates(ContextUpdate update)
+        private async Task HandleCriteriaChecks(ContextUpdate update)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var campaigns = await ctx.Campaigns
-                .Include(campaign => campaign.Conditions)
-                .Where(campaign => campaign.Conditions.Any(condition => condition.Type == ConditionType.KYCCondition))
-                .ToListAsync();
+            var contexts = new List<CampaignClientContext>();
+
+            var campaigns = await _campaignRepository.GetCampaignsWithoutThisClient(update.ClientId);
 
             foreach (var campaign in campaigns)
             {
-                if (campaign.CampaignClientContexts.TryGetValue(update.ClientId, out var context))
+                var results = new List<bool>();
+                foreach (var criteria in campaign.CriteriaList)
                 {
-                    var conditions = campaign.Conditions.Where(t => t.Type == ConditionType.KYCCondition).ToList();
-                    foreach (var condition in conditions.Where(condition => update.KycEvent.KycPassed))
+                    results.Add(await criteria.Check(update.Context));
+                }
+                if (results.TrueForAll(t=>t))
+                {
+                    contexts.Add(new CampaignClientContext
                     {
-                        context.Conditions[condition.ConditionId] = ConditionStatus.Met;
+                        ClientId = update.ClientId,
+                        CampaignId = campaign.Id,
+                        ActivationTime = DateTime.UtcNow,
+                        Conditions = new()
+                    });
+                }
+            }
+            await _contextRepository.UpsertContext(contexts);
+        }
+
+        private async Task HandleConditionChecks(ContextUpdate update)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+            var contexts =  await _contextRepository.GetContextById(update.ClientId);
+            var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
+            var conditions = ctx.Conditions
+                .Where(condition => conditionIds.Contains(condition.ConditionId) 
+                                    && condition.Type == update.EventType.ToConditionType())
+                .Include(condition=>condition.Rewards)
+                .ToList();
+
+            foreach (var context in contexts)
+            {
+                foreach (var condition in conditions)
+                {
+                    var result = await condition.Check(update);
+                    var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == condition.ConditionId) ?? new ClientConditionState
+                    {
+                        ClientId = context.ClientId,
+                        ConditionId = condition.ConditionId,
+                        Type = condition.Type,
+                        Status = ConditionStatus.NotMet,
+                    };
+                    if (result)
+                    {
+                        context.Conditions.Remove(conditionState);
+                        conditionState.Status = ConditionStatus.Met;
+                        context.Conditions.Add(conditionState);
                     }
                 }
             }
 
-            await ctx.UpsertAsync(campaigns);
+            await _contextRepository.UpsertContext(contexts);
         }
-        
     }
 }

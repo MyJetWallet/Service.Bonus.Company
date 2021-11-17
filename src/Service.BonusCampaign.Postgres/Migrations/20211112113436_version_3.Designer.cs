@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Service.BonusCampaign.Domain.Models;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Postgres;
 
 #nullable disable
