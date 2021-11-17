@@ -5,6 +5,7 @@ namespace Service.BonusCampaign.Domain.Models.Context
 {
     public class ClientConditionState
     {
+        public string CampaignId { get; set; }
         public string ClientId { get; set; }
         public string ConditionId { get; set; }
         public ConditionType Type { get; set; }

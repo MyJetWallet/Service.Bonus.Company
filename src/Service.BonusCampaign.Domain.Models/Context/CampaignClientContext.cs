@@ -11,7 +11,6 @@ namespace Service.BonusCampaign.Domain.Models.Context
         public DateTime ActivationTime { get; set; }
         public CampaignStatus Status { get; set; }
         public List<ClientConditionState> Conditions { get; set; }
-        
     }
 
 

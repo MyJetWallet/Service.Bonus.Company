@@ -4,6 +4,9 @@ namespace Service.BonusCampaign.Domain.Models.Enums
     {
         KYCCondition,
         TradeCondition,
-        ReferralCondition
+        ReferralCondition,
+        DepositCondition,
+        WithdrawalCondition, 
+        None = -1,
     }
 }

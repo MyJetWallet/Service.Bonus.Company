@@ -19,9 +19,10 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override string ConditionId { get; set; }
         public override RewardType Type { get; set; }
         public override Dictionary<string, string> GetParams() => ParamDictionary;
+
         public override async Task ExecuteReward(ContextUpdate context)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }
 
         public FeeShareReward(Dictionary<string, string> parameters, string rewardId, string conditionId)

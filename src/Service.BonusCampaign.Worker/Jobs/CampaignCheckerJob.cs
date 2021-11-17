@@ -25,14 +25,14 @@ namespace Service.BonusCampaign.Worker.Jobs
         private async Task DoProcess()
         {
             var campaigns = await _campaignRepository.GetCampaigns();
-            var activeCampaigns = campaigns.Where(t => t.FromDateTime >= DateTime.UtcNow && t.ToDateTime < DateTime.UtcNow && t.IsEnabled).ToList();
+            var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
             foreach (var campaign in activeCampaigns)
             {
                 campaign.Status = CampaignStatus.Active;
             }
             await _campaignRepository.UpsertCampaign(activeCampaigns);
             
-            var finishedCampaigns = campaigns.Where(t => t.ToDateTime >= DateTime.UtcNow).ToList();
+            var finishedCampaigns = campaigns.Where(t => t.ToDateTime <= DateTime.UtcNow).ToList();
             foreach (var campaign in finishedCampaigns)
             {
                 campaign.Status = CampaignStatus.Finished;

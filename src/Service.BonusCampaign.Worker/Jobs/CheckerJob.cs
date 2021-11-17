@@ -53,7 +53,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                         ClientId = update.ClientId,
                         CampaignId = campaign.Id,
                         ActivationTime = DateTime.UtcNow,
-                        Conditions = new()
+                        Conditions = campaign.Conditions.Select(condition => new ClientConditionState { CampaignId = campaign.Id, ClientId = update.ClientId, ConditionId = condition.ConditionId, Type = condition.Type, Status = ConditionStatus.NotMet, }).ToList()
                     });
                 }
             }
@@ -77,13 +77,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                 foreach (var condition in conditions)
                 {
                     var result = await condition.Check(update);
-                    var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == condition.ConditionId) ?? new ClientConditionState
-                    {
-                        ClientId = context.ClientId,
-                        ConditionId = condition.ConditionId,
-                        Type = condition.Type,
-                        Status = ConditionStatus.NotMet,
-                    };
+                    var conditionState = context.Conditions.First(t => t.ConditionId == condition.ConditionId);
                     if (result)
                     {
                         context.Conditions.Remove(conditionState);

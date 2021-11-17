@@ -4,5 +4,6 @@ namespace Service.BonusCampaign.Domain.Models.Enums
     {
         RegistrationType,
         KycType,
+        None = -1,
     }
 }

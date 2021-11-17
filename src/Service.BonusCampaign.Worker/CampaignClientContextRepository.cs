@@ -42,12 +42,14 @@ namespace Service.BonusCampaign.Worker
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(new[] { context });
+            await ctx.UpsertAsync(context.Conditions);
         }
         
         public async Task UpsertContext(List<CampaignClientContext> contexts)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(contexts);
+            await ctx.UpsertAsync(contexts.SelectMany(t => t.Conditions));
         }
     }
 }

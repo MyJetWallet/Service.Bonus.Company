@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Service.BonusCampaign.Postgres;
@@ -12,9 +13,10 @@ using Service.BonusCampaign.Postgres;
 namespace Service.BonusCampaign.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20211117134359_version_6")]
+    partial class version_6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,21 +91,26 @@ namespace Service.BonusCampaign.Postgres.Migrations
 
             modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Context.CampaignClientContext", b =>
                 {
-                    b.Property<string>("ClientId")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                    b.Property<int>("CampaignContextId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CampaignContextId"));
+
+                    b.Property<DateTime>("ActivationTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CampaignId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<DateTime>("ActivationTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("ClientId")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.HasKey("ClientId", "CampaignId");
+                    b.HasKey("CampaignContextId");
 
                     b.HasIndex("CampaignId");
 
@@ -120,9 +127,8 @@ namespace Service.BonusCampaign.Postgres.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<string>("CampaignId")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                    b.Property<int>("CampaignContextId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Params")
                         .HasColumnType("text");
@@ -133,9 +139,9 @@ namespace Service.BonusCampaign.Postgres.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.HasKey("ClientId", "ConditionId", "CampaignId");
+                    b.HasKey("ClientId", "ConditionId");
 
-                    b.HasIndex("ClientId", "CampaignId");
+                    b.HasIndex("CampaignContextId");
 
                     b.ToTable("conditionstates", "bonuscampaign");
                 });
@@ -225,16 +231,14 @@ namespace Service.BonusCampaign.Postgres.Migrations
                 {
                     b.HasOne("Service.BonusCampaign.Domain.Models.Campaign", null)
                         .WithMany("CampaignClientContexts")
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CampaignId");
                 });
 
             modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Context.ClientConditionState", b =>
                 {
                     b.HasOne("Service.BonusCampaign.Domain.Models.Context.CampaignClientContext", null)
                         .WithMany("Conditions")
-                        .HasForeignKey("ClientId", "CampaignId")
+                        .HasForeignKey("CampaignContextId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

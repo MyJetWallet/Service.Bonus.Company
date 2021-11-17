@@ -23,7 +23,7 @@ namespace Service.BonusCampaign.Worker
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             return await ctx.Campaigns.Where(campaign =>
                 campaign.Status == CampaignStatus.Active &&
-                campaign.CampaignClientContexts.All(context => context.ClientId != clientId)).Include(t=>t.CriteriaList).ToListAsync();
+                campaign.CampaignClientContexts.All(context => context.ClientId != clientId)).Include(t=>t.CriteriaList).Include(t=>t.Conditions).ToListAsync();
         }
 
         public async Task<List<Campaign>> GetCampaigns()

@@ -31,7 +31,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override Dictionary<string, string> GetParams() => ParamDictionary;
         public override async Task ExecuteReward(ContextUpdate context)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }
     }
 }

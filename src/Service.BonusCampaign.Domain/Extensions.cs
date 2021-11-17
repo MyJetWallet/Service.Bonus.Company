@@ -19,7 +19,7 @@ namespace Service.BonusCampaign.Domain
                 case EventType.TradeMade:
                 case EventType.WithdrawalMade:
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                   return CriteriaType.None;
             }
         }
         
@@ -33,11 +33,13 @@ namespace Service.BonusCampaign.Domain
                     return ConditionType.ReferralCondition;
                 case EventType.TradeMade:
                     return ConditionType.TradeCondition;
-                case EventType.ClientRegistered:
                 case EventType.DepositMade:
+                    return ConditionType.DepositCondition;
                 case EventType.WithdrawalMade:
+                    return ConditionType.WithdrawalCondition;
+                case EventType.ClientRegistered:
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    return ConditionType.None;
             }
         }
     }
