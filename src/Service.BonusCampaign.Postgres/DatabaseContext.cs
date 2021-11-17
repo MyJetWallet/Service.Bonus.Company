@@ -62,8 +62,8 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<Campaign>().Property(e => e.Status);
             modelBuilder.Entity<Campaign>().Property(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().Property(e => e.BannerId).HasMaxLength(128);
-            modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime).HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));;
-            modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime).HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));;
+            modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime);
+            modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime);
 
             modelBuilder.Entity<Campaign>().HasIndex(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().HasIndex(e => e.FromDateTime);

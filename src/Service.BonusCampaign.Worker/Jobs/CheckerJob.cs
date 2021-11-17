@@ -13,12 +13,12 @@ using Service.BonusClientContext.Domain.Models;
 
 namespace Service.BonusCampaign.Worker.Jobs
 {
-    public class ConditionCheckerJob
+    public class CheckerJob
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignClientContextRepository _contextRepository;
         private readonly CampaignRepository _campaignRepository;
-        public ConditionCheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository)
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;

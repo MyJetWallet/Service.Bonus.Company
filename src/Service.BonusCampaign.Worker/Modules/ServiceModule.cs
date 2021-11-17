@@ -19,8 +19,9 @@ namespace Service.BonusCampaign.Worker.Modules
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             
-            builder.RegisterType<ConditionCheckerJob>().AsSelf().AutoActivate().SingleInstance();
-            
+            builder.RegisterType<CheckerJob>().AsSelf().AutoActivate().SingleInstance();
+            builder.RegisterType<CampaignCheckerJob>().AsSelf().SingleInstance();
+
         }
     }
 }
