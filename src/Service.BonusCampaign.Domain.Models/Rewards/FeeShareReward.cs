@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusClientContext.Domain.Models;
+using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Rewards
 {
@@ -20,11 +22,18 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override RewardType Type { get; set; }
         public override Dictionary<string, string> GetParams() => ParamDictionary;
 
-        public override async Task ExecuteReward(ContextUpdate context)
+        public override async Task ExecuteReward(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher)
         {
+            await publisher.PublishAsync(new ExecuteRewardMessage
+            {
+                ClientId = context.ClientId,
+                RewardType = Type,
+                FeeShareGroup = Parameters[FeeShareGroup],
+                RewardId = RewardId,
+            });
             Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }
-
+        
         public FeeShareReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
         {
             Type = RewardType.FeeShareAssignment;

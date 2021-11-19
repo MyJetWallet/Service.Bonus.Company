@@ -1,8 +1,10 @@
 ﻿using Autofac;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
+using Service.BonusCampaign.Worker.Helpers;
 using Service.BonusCampaign.Worker.Jobs;
 using Service.BonusClientContext.Domain.Models;
+using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Worker.Modules
 {
@@ -15,6 +17,8 @@ namespace Service.BonusCampaign.Worker.Modules
             var spotServiceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), Program.LogFactory);
             builder.RegisterMyServiceBusSubscriberSingle<ContextUpdate>(spotServiceBusClient,
                 ContextUpdate.TopicName, queueName, TopicQueueType.PermanentWithSingleConnection);
+            builder.RegisterMyServiceBusPublisher<ExecuteRewardMessage>(spotServiceBusClient,
+                ExecuteRewardMessage.TopicName, false);
             
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();

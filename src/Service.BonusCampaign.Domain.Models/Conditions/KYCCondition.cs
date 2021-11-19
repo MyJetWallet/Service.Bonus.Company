@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
+using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions
 {
@@ -39,13 +41,13 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check(ContextUpdate context)
+        public override async Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher)
         {
             if (context.KycEvent != null && context.KycEvent.KycPassed)
             {
                 foreach (var reward in Rewards)
                 {
-                    await reward.ExecuteReward(context);
+                    await reward.ExecuteReward(context, publisher);
                 }
                 return true;
             }

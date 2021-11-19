@@ -15,5 +15,8 @@ namespace Service.BonusCampaign.Grpc
         
         [OperationContract]
         ParamsResponse GetAllParams();
+
+        [OperationContract]
+        Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request);
     }
 }

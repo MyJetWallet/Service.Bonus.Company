@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
 
-namespace Service.BonusCampaign.Worker
+namespace Service.BonusCampaign.Worker.Helpers
 {
     public class CampaignClientContextRepository
     {

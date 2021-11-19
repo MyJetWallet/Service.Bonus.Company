@@ -6,7 +6,7 @@ using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
 
-namespace Service.BonusCampaign.Worker
+namespace Service.BonusCampaign.Worker.Helpers
 {
     public class CampaignRepository
     {

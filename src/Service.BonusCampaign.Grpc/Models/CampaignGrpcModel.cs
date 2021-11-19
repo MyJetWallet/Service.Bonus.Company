@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
@@ -23,6 +24,7 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 7)] public string BannerId { get; set; }
         [DataMember(Order = 8)] public List<AccessCriteriaGrpcModel> CriteriaList { get; set; }
         [DataMember(Order = 9)] public List<ConditionGrpcModel> Conditions { get; set; }
+        [DataMember(Order = 10)] public List<CampaignClientContextGrpcModel> Contexts { get; set; }
     }
 
     [DataContract]
@@ -53,10 +55,51 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 2)] public RewardType Type { get; set; }
         [DataMember(Order = 3)] public Dictionary<string, string> Parameters { get; set; }
     }
+    
+    [DataContract]
+    public class CampaignClientContextGrpcModel
+    {
+        [DataMember(Order = 1)] public string ClientId { get; set; }
+        [DataMember(Order = 2)] public string CampaignId { get; set; }
+        [DataMember(Order = 3)] public DateTime ActivationTime { get; set; }
+        [DataMember(Order = 4)] public List<ConditionStateGrpcModel> Conditions { get; set; }
+    }
 
+    [DataContract]
+    public class ConditionStateGrpcModel
+    {
+        [DataMember(Order = 1)] public string ClientId { get; set; }
+        [DataMember(Order = 2)] public string CampaignId { get; set; }
+        [DataMember(Order = 3)] public string ConditionId { get; set; }
+        [DataMember(Order = 4)] public ConditionType Type { get; set; }
+        [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
+    }
 
     public static class CampaignExtensions
     {
+        public static ConditionStateGrpcModel ToGrpcModel(this ClientConditionState conditionState)
+        {
+            return new ConditionStateGrpcModel
+            {
+                ClientId = conditionState.ClientId,
+                CampaignId = conditionState.CampaignId,
+                ConditionId = conditionState.ConditionId,
+                Type = conditionState.Type,
+                Status = conditionState.Status
+            };
+        }
+
+        public static CampaignClientContextGrpcModel ToGrpcModel(this CampaignClientContext context)
+        { 
+            return new CampaignClientContextGrpcModel
+            {
+                ClientId = context.ClientId,
+                CampaignId = context.CampaignId,
+                ActivationTime = context.ActivationTime,
+                Conditions = context.Conditions?.Select(t=>t.ToGrpcModel()).ToList() ?? new ()
+            };
+        }
+
         public static RewardGrpcModel ToGrpcModel(this RewardBase rewardBase)
         {
             return new RewardGrpcModel
@@ -101,8 +144,10 @@ namespace Service.BonusCampaign.Grpc.Models
                 Status = campaign.Status,
                 BannerId = campaign.BannerId,
                 CriteriaList = campaign.CriteriaList?.Select(ToGrpcModel).ToList() ?? new (),
-                Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new ()
+                Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new (),
+                Contexts = campaign.CampaignClientContexts?.Select(ToGrpcModel).ToList() ?? new (),
             };
         }
+        
     }
 }

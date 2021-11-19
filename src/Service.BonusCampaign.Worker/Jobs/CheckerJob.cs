@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
+using Service.BonusCampaign.Worker.Helpers;
 using Service.BonusClientContext.Domain.Models;
+using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Worker.Jobs
 {
@@ -18,11 +21,13 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignClientContextRepository _contextRepository;
         private readonly CampaignRepository _campaignRepository;
-        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository)
+        private readonly IServiceBusPublisher<ExecuteRewardMessage> _publisher;
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;
             _campaignRepository = campaignRepository;
+            _publisher = publisher;
             subscriber.Subscribe(HandleUpdates);
         }
 
@@ -76,7 +81,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             {
                 foreach (var condition in conditions)
                 {
-                    var result = await condition.Check(update);
+                    var result = await condition.Check(update, _publisher);
                     var conditionState = context.Conditions.First(t => t.ConditionId == condition.ConditionId);
                     if (result)
                     {

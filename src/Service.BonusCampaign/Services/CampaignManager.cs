@@ -88,6 +88,8 @@ namespace Service.BonusCampaign.Services
                 .Include(t=>t.CriteriaList)
                 .Include(t=>t.Conditions)
                 .ThenInclude(t=>t.Rewards)
+                .Include(t=>t.CampaignClientContexts)
+                .ThenInclude(t=>t.Conditions)
                 .Select(t => t.ToGrpcModel()).ToList();
             return new GetAllCampaignsResponse
             {
@@ -106,6 +108,17 @@ namespace Service.BonusCampaign.Services
 
             //locals
             List<ParamsDict> ToListOfParams(Dictionary<string, string> parameters) => parameters.Select(keyValuePair => new ParamsDict { ParamName = keyValuePair.Key, ParamType = keyValuePair.Value }).ToList();
+        }
+
+        public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId)
+                .Include(t => t.Conditions).Select(t => t.ToGrpcModel()).ToList();
+            return new GetContextsByClientResponse()
+            {
+                Contexts = contexts
+            };
         }
     }
 }

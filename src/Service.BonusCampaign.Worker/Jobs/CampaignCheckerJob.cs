@@ -6,6 +6,7 @@ using Autofac;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
 using Service.BonusCampaign.Domain.Models.Enums;
+using Service.BonusCampaign.Worker.Helpers;
 
 namespace Service.BonusCampaign.Worker.Jobs
 {

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusClientContext.Domain.Models;
+using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Rewards
 {
@@ -20,6 +22,6 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
 
         public abstract RewardType Type { get; set; }
         public abstract Dictionary<string, string> GetParams();
-        public abstract Task ExecuteReward(ContextUpdate context);
+        public abstract Task ExecuteReward(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher);
     }
 }
