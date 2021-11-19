@@ -27,7 +27,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
             await publisher.PublishAsync(new ExecuteRewardMessage
             {
                 ClientId = context.ClientId,
-                RewardType = Type,
+                RewardType = RewardType.FeeShareAssignment.ToString(),
                 FeeShareGroup = Parameters[FeeShareGroup],
                 RewardId = RewardId,
             });

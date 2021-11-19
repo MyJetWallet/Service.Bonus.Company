@@ -36,7 +36,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
             await publisher.PublishAsync(new ExecuteRewardMessage
             {
                 ClientId = context.ClientId,
-                RewardType = Type,
+                RewardType = RewardType.ClientPaymentAbsolute.ToString(),
                 Asset = Parameters[PaidAsset],
                 AmountAbs = decimal.Parse(Parameters[AmountParam]),
                 RewardId = RewardId,
