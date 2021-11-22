@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Conditions;
@@ -22,12 +24,15 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly CampaignClientContextRepository _contextRepository;
         private readonly CampaignRepository _campaignRepository;
         private readonly IServiceBusPublisher<ExecuteRewardMessage> _publisher;
-        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher)
+        private readonly ILogger<CheckerJob> _logger;
+
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;
             _campaignRepository = campaignRepository;
             _publisher = publisher;
+            _logger = logger;
             subscriber.Subscribe(HandleUpdates);
         }
 
@@ -39,60 +44,84 @@ namespace Service.BonusCampaign.Worker.Jobs
 
         private async Task HandleCriteriaChecks(ContextUpdate update)
         {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = new List<CampaignClientContext>();
-
-            var campaigns = await _campaignRepository.GetCampaignsWithoutThisClient(update.ClientId);
-
-            foreach (var campaign in campaigns)
+            try
             {
-                var results = new List<bool>();
-                foreach (var criteria in campaign.CriteriaList)
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var contexts = new List<CampaignClientContext>();
+
+                var campaigns = await _campaignRepository.GetCampaignsWithoutThisClient(update.ClientId);
+
+                foreach (var campaign in campaigns)
                 {
-                    results.Add(await criteria.Check(update.Context));
-                }
-                if (results.TrueForAll(t=>t))
-                {
-                    contexts.Add(new CampaignClientContext
+                    var results = new List<bool>();
+                    foreach (var criteria in campaign.CriteriaList)
                     {
-                        ClientId = update.ClientId,
-                        CampaignId = campaign.Id,
-                        ActivationTime = DateTime.UtcNow,
-                        Conditions = campaign.Conditions.Select(condition => new ClientConditionState { CampaignId = campaign.Id, ClientId = update.ClientId, ConditionId = condition.ConditionId, Type = condition.Type, Status = ConditionStatus.NotMet, }).ToList()
-                    });
+                        results.Add(await criteria.Check(update.Context));
+                    }
+
+                    if (results.TrueForAll(t => t))
+                    {
+                        contexts.Add(new CampaignClientContext
+                        {
+                            ClientId = update.ClientId,
+                            CampaignId = campaign.Id,
+                            ActivationTime = DateTime.UtcNow,
+                            Conditions = campaign.Conditions.Select(condition => new ClientConditionState
+                            {
+                                CampaignId = campaign.Id, ClientId = update.ClientId,
+                                ConditionId = condition.ConditionId, Type = condition.Type,
+                                Status = ConditionStatus.NotMet,
+                            }).ToList()
+                        });
+                    }
                 }
+
+                await _contextRepository.UpsertContext(contexts);
             }
-            await _contextRepository.UpsertContext(contexts);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When checking criteria for update {requestJson}", JsonSerializer.Serialize(update));
+                throw;
+            }
         }
 
         private async Task HandleConditionChecks(ContextUpdate update)
         {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-
-            var contexts =  await _contextRepository.GetContextById(update.ClientId);
-            var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
-            var conditions = ctx.Conditions
-                .Where(condition => conditionIds.Contains(condition.ConditionId) 
-                                    && condition.Type == update.EventType.ToConditionType())
-                .Include(condition=>condition.Rewards)
-                .ToList();
-
-            foreach (var context in contexts)
+            try
             {
-                foreach (var condition in conditions)
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+                var contexts = await _contextRepository.GetContextById(update.ClientId);
+                var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
+                var conditions = ctx.Conditions
+                    .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                        && condition.Type == update.EventType.ToConditionType())
+                    .Include(condition => condition.Rewards)
+                    .ToList();
+
+                foreach (var context in contexts)
                 {
-                    var result = await condition.Check(update, _publisher);
-                    var conditionState = context.Conditions.First(t => t.ConditionId == condition.ConditionId);
-                    if (result)
+                    foreach (var condition in conditions)
                     {
-                        context.Conditions.Remove(conditionState);
-                        conditionState.Status = ConditionStatus.Met;
-                        context.Conditions.Add(conditionState);
+                        var result = await condition.Check(update, _publisher);
+                        var conditionState = context.Conditions.First(t => t.ConditionId == condition.ConditionId);
+                        if (result)
+                        {
+                            context.Conditions.Remove(conditionState);
+                            conditionState.Status = ConditionStatus.Met;
+                            context.Conditions.Add(conditionState);
+                        }
                     }
                 }
-            }
 
-            await _contextRepository.UpsertContext(contexts);
+                await _contextRepository.UpsertContext(contexts);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When checking conditions for update {requestJson}",
+                    JsonSerializer.Serialize(update));
+                throw;
+            }
         }
     }
 }

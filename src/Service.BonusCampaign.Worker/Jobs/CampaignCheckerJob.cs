@@ -25,6 +25,7 @@ namespace Service.BonusCampaign.Worker.Jobs
 
         private async Task DoProcess()
         {
+            _logger.LogInformation("Checking campaign statuses");
             var campaigns = await _campaignRepository.GetCampaigns();
             var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
             foreach (var campaign in activeCampaigns)
@@ -39,6 +40,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                 campaign.Status = CampaignStatus.Finished;
             }
             await _campaignRepository.UpsertCampaign(finishedCampaigns);
+            _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }
 
         public void Start() => _timer.Start();

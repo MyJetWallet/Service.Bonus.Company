@@ -29,7 +29,9 @@ namespace Service.BonusCampaign.Worker.Helpers
         public async Task<List<Campaign>> GetCampaigns()
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            return await ctx.Campaigns.ToListAsync();
+            
+            var t = await ctx.Campaigns.ToListAsync();
+            return t;
         }
 
         public async Task UpsertCampaign(Campaign campaign)
