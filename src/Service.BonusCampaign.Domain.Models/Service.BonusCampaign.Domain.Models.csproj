@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="MyJetWallet.Service.BonusClientContext.Client" Version="1.0.2" />
-    <PackageReference Include="MyJetWallet.Service.BonusRewards.Client" Version="1.0.3" />
+    <PackageReference Include="MyJetWallet.Service.BonusRewards.Client" Version="1.0.4" />
   </ItemGroup>
 
 </Project>

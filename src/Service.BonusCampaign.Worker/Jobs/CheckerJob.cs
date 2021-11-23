@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +82,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             catch (Exception e)
             {
                 _logger.LogError(e, "When checking criteria for update {requestJson}", JsonSerializer.Serialize(update));
+                Thread.Sleep(10000);
                 throw;
             }
         }
@@ -120,6 +122,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             {
                 _logger.LogError(e, "When checking conditions for update {requestJson}",
                     JsonSerializer.Serialize(update));
+                Thread.Sleep(10000);
                 throw;
             }
         }
