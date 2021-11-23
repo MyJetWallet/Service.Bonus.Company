@@ -106,8 +106,8 @@ namespace Service.BonusCampaign.Worker.Jobs
                     foreach (var condition in conditions)
                     {
                         var result = await condition.Check(update, _publisher);
-                        var conditionState = context.Conditions.First(t => t.ConditionId == condition.ConditionId);
-                        if (result)
+                        var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == condition.ConditionId);
+                        if (result && conditionState != null)
                         {
                             context.Conditions.Remove(conditionState);
                             conditionState.Status = ConditionStatus.Met;
