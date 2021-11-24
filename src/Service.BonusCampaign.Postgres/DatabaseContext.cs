@@ -76,8 +76,11 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<AccessCriteriaBase>().HasKey(e => e.CriteriaId);
             modelBuilder.Entity<AccessCriteriaBase>().Property(e => e.Parameters).HasColumnType("jsonb");
             modelBuilder.Entity<AccessCriteriaBase>().HasDiscriminator(e => e.CriteriaType)
-                .HasValue<KycCriteria>(CriteriaType.KycType);
+                .HasValue<KycCriteria>(CriteriaType.KycType)
+                .HasValue<ReferralCriteria>(CriteriaType.ReferralType);
+            
             modelBuilder.Entity<KycCriteria>().HasBaseType<AccessCriteriaBase>();
+            modelBuilder.Entity<ReferralCriteria>().HasBaseType<AccessCriteriaBase>();
 
             modelBuilder.Entity<AccessCriteriaBase>().HasOne<Campaign>().WithMany(t => t.CriteriaList).HasForeignKey(t=>t.CampaignId);
             
@@ -94,9 +97,14 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().Property(e => e.Parameters).HasColumnType("jsonb");
 
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
-                .HasValue<KycCondition>(ConditionType.KYCCondition);
-            modelBuilder.Entity<KycCondition>().HasBaseType<ConditionBase>();
+                .HasValue<KycCondition>(ConditionType.KYCCondition)
+                .HasValue<TradeCondition>(ConditionType.TradeCondition)
+                .HasValue<DepositCondition>(ConditionType.DepositCondition);
             
+            modelBuilder.Entity<KycCondition>().HasBaseType<ConditionBase>();
+            modelBuilder.Entity<TradeCondition>().HasBaseType<ConditionBase>();
+            modelBuilder.Entity<DepositCondition>().HasBaseType<ConditionBase>();
+
             modelBuilder.Entity<ConditionBase>().HasOne<Campaign>().WithMany(t => t.Conditions).HasForeignKey(t=>t.CampaignId);
 
         }

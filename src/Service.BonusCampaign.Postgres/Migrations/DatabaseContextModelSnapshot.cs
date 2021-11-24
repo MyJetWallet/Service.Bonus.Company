@@ -186,6 +186,13 @@ namespace Service.BonusCampaign.Postgres.Migrations
                     b.HasDiscriminator<int>("Type");
                 });
 
+            modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Conditions.DepositCondition", b =>
+                {
+                    b.HasBaseType("Service.BonusCampaign.Domain.Models.Conditions.ConditionBase");
+
+                    b.HasDiscriminator().HasValue(3);
+                });
+
             modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Conditions.KycCondition", b =>
                 {
                     b.HasBaseType("Service.BonusCampaign.Domain.Models.Conditions.ConditionBase");
@@ -193,11 +200,25 @@ namespace Service.BonusCampaign.Postgres.Migrations
                     b.HasDiscriminator().HasValue(0);
                 });
 
+            modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Conditions.TradeCondition", b =>
+                {
+                    b.HasBaseType("Service.BonusCampaign.Domain.Models.Conditions.ConditionBase");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
             modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Criteria.KycCriteria", b =>
                 {
                     b.HasBaseType("Service.BonusCampaign.Domain.Models.Criteria.AccessCriteriaBase");
 
                     b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Criteria.ReferralCriteria", b =>
+                {
+                    b.HasBaseType("Service.BonusCampaign.Domain.Models.Criteria.AccessCriteriaBase");
+
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("Service.BonusCampaign.Domain.Models.Rewards.ClientPaymentReward", b =>

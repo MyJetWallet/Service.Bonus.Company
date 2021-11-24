@@ -19,5 +19,8 @@ namespace Service.BonusCampaign.Worker.Settings
         
         [YamlProperty("BonusCampaign.SpotServiceBusHostPort")]
         public string SpotServiceBusHostPort { get; set; }
+        
+        [YamlProperty("BonusCampaign.MyNoSqlReaderHostPort")]
+        public string MyNoSqlReaderHostPort { get; set; }
     }
 }

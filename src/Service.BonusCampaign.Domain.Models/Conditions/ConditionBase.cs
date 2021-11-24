@@ -5,6 +5,7 @@ using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
+using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions
 {
@@ -19,7 +20,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract ConditionStatus Status { get; set; }
         
         public abstract Dictionary<string, string> GetParams();
-        public abstract Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher);
+        public abstract Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson);
+        public abstract Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient);
 
     }
 }

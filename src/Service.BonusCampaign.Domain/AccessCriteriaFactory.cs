@@ -14,6 +14,8 @@ namespace Service.BonusCampaign.Domain
             {
                 case CriteriaType.KycType:
                     return new KycCriteria(parameters, criteriaID, campaignId);
+                case CriteriaType.ReferralType:
+                    return new ReferralCriteria(parameters, criteriaID, campaignId);
                 case CriteriaType.RegistrationType:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

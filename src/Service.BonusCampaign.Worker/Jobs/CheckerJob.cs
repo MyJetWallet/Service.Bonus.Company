@@ -16,6 +16,7 @@ using Service.BonusCampaign.Postgres;
 using Service.BonusCampaign.Worker.Helpers;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
+using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Worker.Jobs
 {
@@ -26,14 +27,16 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly CampaignRepository _campaignRepository;
         private readonly IServiceBusPublisher<ExecuteRewardMessage> _publisher;
         private readonly ILogger<CheckerJob> _logger;
+        private readonly IConvertIndexPricesClient _pricesClient;
 
-        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger)
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger, IConvertIndexPricesClient pricesClient)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;
             _campaignRepository = campaignRepository;
             _publisher = publisher;
             _logger = logger;
+            _pricesClient = pricesClient;
             subscriber.Subscribe(HandleUpdates);
         }
 
@@ -108,13 +111,13 @@ namespace Service.BonusCampaign.Worker.Jobs
                         var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == condition.ConditionId);
                         if (conditionState != null)
                         {
-                            var result = await condition.Check(update, _publisher);
+                            conditionState.Params =
+                                await condition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
+                            
+                            var result = await condition.Check(update, _publisher, conditionState.Params);
+                            
                             if (result)
-                            {
-                                context.Conditions.Remove(conditionState);
                                 conditionState.Status = ConditionStatus.Met;
-                                context.Conditions.Add(conditionState);
-                            }
                         }
                     }
                 }
