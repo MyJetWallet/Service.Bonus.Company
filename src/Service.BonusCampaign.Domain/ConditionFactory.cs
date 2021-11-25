@@ -18,6 +18,9 @@ namespace Service.BonusCampaign.Domain
                 case ConditionType.KYCCondition:
                     return new KycCondition(campaignId, parameters, rewards, conditionId);
                 case ConditionType.TradeCondition:
+                    return new TradeCondition(campaignId, parameters, rewards, conditionId);
+                case ConditionType.DepositCondition:
+                    return new DepositCondition(campaignId, parameters, rewards, conditionId);
                 case ConditionType.ReferralCondition:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
