@@ -19,7 +19,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         {
             CriteriaId = criteriaId ?? Guid.NewGuid().ToString("N");
             CampaignId = campaignId;
-            CriteriaType = CriteriaType.KycType;
+            CriteriaType = CriteriaType.ReferralType;
             Parameters = parameters;
             if (!parameters.TryGetValue(ReferralParam, out var hasReferral) && !bool.TryParse(hasReferral, out _hasReferral))
             {
