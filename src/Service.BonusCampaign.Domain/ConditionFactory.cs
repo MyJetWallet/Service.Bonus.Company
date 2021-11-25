@@ -33,6 +33,10 @@ namespace Service.BonusCampaign.Domain
             {
                 case ConditionType.KYCCondition:
                     return KycCondition.ParamDictionary;
+                case ConditionType.DepositCondition:
+                    return DepositCondition.ParamDictionary;
+                case ConditionType.TradeCondition:
+                    return TradeCondition.ParamDictionary;
                 default:
                     return new Dictionary<string, string>();
             }

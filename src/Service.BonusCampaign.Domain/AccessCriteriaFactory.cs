@@ -28,6 +28,8 @@ namespace Service.BonusCampaign.Domain
             {
                 case CriteriaType.KycType:
                     return KycCriteria.ParamDictionary;
+                case CriteriaType.ReferralType:
+                    return ReferralCriteria.ParamDictionary;
                 default:
                     return new Dictionary<string, string>();
             }
