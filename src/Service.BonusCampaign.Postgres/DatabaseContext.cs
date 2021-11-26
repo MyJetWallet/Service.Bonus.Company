@@ -62,8 +62,8 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<Campaign>().Property(e => e.Status);
             modelBuilder.Entity<Campaign>().Property(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().Property(e => e.BannerId).HasMaxLength(128);
-            modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime);
-            modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime);
+            modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime).HasDefaultValue(DateTime.MinValue);
+            modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime).HasDefaultValue(DateTime.MinValue);
 
             modelBuilder.Entity<Campaign>().HasIndex(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().HasIndex(e => e.FromDateTime);
@@ -136,6 +136,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<CampaignClientContext>().HasKey(e => new{ e.ClientId, e.CampaignId });
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.CampaignId).HasMaxLength(128);           
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.ClientId).HasMaxLength(128);
+            modelBuilder.Entity<CampaignClientContext>().Property(e => e.ActivationTime).HasDefaultValue(DateTime.MinValue);
 
             //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
             
@@ -149,7 +150,6 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ConditionId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.CampaignId).HasMaxLength(128);
-
             //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
             
             modelBuilder.Entity<ClientConditionState>().HasOne<CampaignClientContext>().WithMany(t => t.Conditions).HasForeignKey(t=>new {t.ClientId, t.CampaignId});
