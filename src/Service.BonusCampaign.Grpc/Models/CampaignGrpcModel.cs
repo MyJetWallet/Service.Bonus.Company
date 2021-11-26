@@ -45,7 +45,7 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 4)] public List<RewardGrpcModel> Rewards { get; set; }
         [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
         [DataMember(Order = 6)] public string ConditionId { get; set; }
-
+        [DataMember(Order = 7)] public TimeSpan TimeToComplete { get; set; }
     }
     
     [DataContract]

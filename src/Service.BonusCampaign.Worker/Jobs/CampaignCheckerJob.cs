@@ -34,7 +34,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             }
             await _campaignRepository.UpsertCampaign(activeCampaigns);
             
-            var finishedCampaigns = campaigns.Where(t => t.ToDateTime <= DateTime.UtcNow).ToList();
+            var finishedCampaigns = campaigns.Where(t => t.ToDateTime <= DateTime.UtcNow && t.Status != CampaignStatus.Finished).ToList();
             foreach (var campaign in finishedCampaigns)
             {
                 campaign.Status = CampaignStatus.Finished;

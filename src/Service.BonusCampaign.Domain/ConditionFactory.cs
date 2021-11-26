@@ -11,16 +11,18 @@ namespace Service.BonusCampaign.Domain
 {
     public static class ConditionFactory
     {
-        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId)
+        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete)
         {
             switch (type)
             {
                 case ConditionType.KYCCondition:
-                    return new KycCondition(campaignId, parameters, rewards, conditionId);
+                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
                 case ConditionType.TradeCondition:
-                    return new TradeCondition(campaignId, parameters, rewards, conditionId);
+                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
                 case ConditionType.DepositCondition:
-                    return new DepositCondition(campaignId, parameters, rewards, conditionId);
+                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
+                case ConditionType.ConditionsCondition:
+                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
                 case ConditionType.ReferralCondition:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -37,6 +39,8 @@ namespace Service.BonusCampaign.Domain
                     return DepositCondition.ParamDictionary;
                 case ConditionType.TradeCondition:
                     return TradeCondition.ParamDictionary;
+                case ConditionType.ConditionsCondition:
+                    return ConditionsCondition.ParamDictionary;
                 default:
                     return new Dictionary<string, string>();
             }

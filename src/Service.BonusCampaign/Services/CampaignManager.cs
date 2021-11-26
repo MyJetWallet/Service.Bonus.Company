@@ -45,7 +45,7 @@ namespace Service.BonusCampaign.Services
                     from conditionRequest 
                         in request.Conditions 
                     let rewards = conditionRequest.Rewards?.Select(rewardRequest => RewardFactory.CreateReward(rewardRequest.Type, rewardRequest.Parameters, rewardRequest.RewardId, conditionRequest.ConditionId)).ToList() ?? new List<RewardBase>()
-                    select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId, conditionRequest.ConditionId));
+                    select ConditionFactory.CreateCondition(conditionRequest.Type, conditionRequest.Parameters, rewards, campaignId, conditionRequest.ConditionId, conditionRequest.TimeToComplete));
 
                 var campaign = new Campaign
                 {

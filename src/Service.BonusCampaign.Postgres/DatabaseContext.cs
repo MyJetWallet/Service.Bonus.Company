@@ -99,11 +99,13 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition)
                 .HasValue<TradeCondition>(ConditionType.TradeCondition)
-                .HasValue<DepositCondition>(ConditionType.DepositCondition);
+                .HasValue<DepositCondition>(ConditionType.DepositCondition)
+                .HasValue<ConditionsCondition>(ConditionType.ConditionsCondition);
             
             modelBuilder.Entity<KycCondition>().HasBaseType<ConditionBase>();
             modelBuilder.Entity<TradeCondition>().HasBaseType<ConditionBase>();
             modelBuilder.Entity<DepositCondition>().HasBaseType<ConditionBase>();
+            modelBuilder.Entity<ConditionsCondition>().HasBaseType<ConditionBase>();
 
             modelBuilder.Entity<ConditionBase>().HasOne<Campaign>().WithMany(t => t.Conditions).HasForeignKey(t=>t.CampaignId);
 

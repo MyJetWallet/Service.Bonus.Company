@@ -15,6 +15,7 @@ namespace Service.BonusCampaign.Domain
                 case EventType.KYCPassed:
                     return CriteriaType.KycType;
                 case EventType.ReferrerAdded:
+                    return CriteriaType.ReferralType;
                 case EventType.DepositMade:
                 case EventType.TradeMade:
                 case EventType.WithdrawalMade:

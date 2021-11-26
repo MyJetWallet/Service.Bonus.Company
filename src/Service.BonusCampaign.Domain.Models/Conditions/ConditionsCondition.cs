@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Context;
@@ -11,34 +12,48 @@ using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions
 {
-    public class DepositCondition : ConditionBase
+    public class ConditionsCondition : ConditionBase
     {
-        private const string DepositParam = "DepositMade";
-        private readonly bool _depositMade;
+        private const string ConditionsParam = "ConditionsList";
+        private readonly List<string> _conditions;
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
-        public override ConditionType Type { get; set; } = ConditionType.DepositCondition;
+        public override ConditionType Type { get; set; } = ConditionType.ConditionsCondition;
         public override Dictionary<string, string> Parameters { get; set; }
         public override List<RewardBase> Rewards { get; set; }
         public override ConditionStatus Status { get; set; }
         public override TimeSpan TimeToComplete { get; set; }
 
-        public DepositCondition()
+        public ConditionsCondition()
         {
         }
-        public DepositCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
+        public ConditionsCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
         {
-            Type = ConditionType.DepositCondition;
+            Type = ConditionType.ConditionsCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
             
             CampaignId = campaignId;
-            EventTypes = new List<EventType>() { EventType.DepositMade };
+            EventTypes = new List<EventType>();
             Status = ConditionStatus.NotMet;
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
 
-            if (!parameters.TryGetValue(DepositParam, out var depositMade) && !bool.TryParse(depositMade, out _depositMade))
+            if (!parameters.TryGetValue(ConditionsParam, out var conditionsString))
+            {
+                throw new Exception("Invalid arguments");
+            }
+
+            try
+            {
+                _conditions = conditionsString.Split(';').ToList();
+            }
+            catch
+            {
+                throw new Exception("Invalid arguments");
+            }
+
+            if (!_conditions.Any())
             {
                 throw new Exception("Invalid arguments");
             }
@@ -52,7 +67,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
                 return false;
             
-            if (context.DepositEvent != null && context.DepositEvent.Amount > 0)
+            var passed = campaignContext.Conditions.All(conditionState => _conditions.Contains(conditionState.ConditionId) && conditionState.Status == ConditionStatus.Met);
+            if (passed)
             {
                 foreach (var reward in Rewards)
                 {
@@ -68,7 +84,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
-            { DepositParam, typeof(bool).ToString() },
+            { ConditionsParam, typeof(string).ToString() },
         };
     }
 }

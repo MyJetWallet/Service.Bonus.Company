@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
@@ -18,9 +20,10 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public static List<EventType> EventTypes { get; set; }
         public abstract List<RewardBase> Rewards { get; set; }
         public abstract ConditionStatus Status { get; set; }
-        
+        public abstract TimeSpan TimeToComplete { get; set; }
+
         public abstract Dictionary<string, string> GetParams();
-        public abstract Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson);
+        public abstract Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);
         public abstract Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient);
 
     }

@@ -7,6 +7,7 @@ namespace Service.BonusCampaign.Domain.Models.Enums
         ReferralCondition,
         DepositCondition,
         WithdrawalCondition, 
+        ConditionsCondition,
         None = -1,
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
@@ -20,11 +21,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override Dictionary<string, string> Parameters { get; set; }
         public override List<RewardBase> Rewards { get; set; }
         public override ConditionStatus Status { get; set; }
+        public override TimeSpan TimeToComplete { get; set; }
 
         public KycCondition()
         {
         }
-        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId)
+        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
         {
             Type = ConditionType.KYCCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -34,7 +36,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Status = ConditionStatus.NotMet;
             Parameters = parameters;
             Rewards = rewards;
-            
+            TimeToComplete = timeToComplete;
+
             if (!parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))
             {
                 throw new Exception("Invalid arguments");
@@ -42,8 +45,13 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson)
+        public override async Task<bool> Check(ContextUpdate context,
+            IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson,
+            CampaignClientContext campaignContext)
         {
+            if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
+                return false;
+            
             if (context.KycEvent != null && context.KycEvent.KycPassed)
             {
                 foreach (var reward in Rewards)

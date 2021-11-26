@@ -114,7 +114,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                             conditionState.Params =
                                 await condition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
                             
-                            var result = await condition.Check(update, _publisher, conditionState.Params);
+                            var result = await condition.Check(update, _publisher, conditionState.Params, context);
                             
                             if (result)
                                 conditionState.Status = ConditionStatus.Met;

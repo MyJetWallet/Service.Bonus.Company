@@ -19,6 +19,6 @@ namespace Service.BonusCampaign.Domain.Models
         public string BannerId { get; set; }
         public List<AccessCriteriaBase> CriteriaList { get; set; }
         public List<ConditionBase> Conditions { get; set; }
-        public List<CampaignClientContext> CampaignClientContexts { get; set; } //TODO: табличка
+        public List<CampaignClientContext> CampaignClientContexts { get; set; }
     }
 }
