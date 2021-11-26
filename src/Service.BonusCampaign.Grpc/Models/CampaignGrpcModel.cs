@@ -119,7 +119,8 @@ namespace Service.BonusCampaign.Grpc.Models
                 Type = conditionBase.Type,
                 Parameters = conditionBase.Parameters,
                 Rewards = conditionBase.Rewards.Select(ToGrpcModel).ToList(),
-                Status = conditionBase.Status
+                Status = conditionBase.Status,
+                TimeToComplete = conditionBase.TimeToComplete
             };
         }
         
