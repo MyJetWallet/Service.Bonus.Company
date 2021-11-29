@@ -15,7 +15,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
     public class ConditionsCondition : ConditionBase
     {
         private const string ConditionsParam = "ConditionsList";
-        private readonly List<string> _conditions;
+        private List<string> _conditions;
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.ConditionsCondition;
@@ -26,6 +26,24 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
         public ConditionsCondition()
         {
+            // if (!Parameters.TryGetValue(ConditionsParam, out var conditionsString))
+            // {
+            //     throw new Exception("Invalid arguments");
+            // }
+            //
+            // try
+            // {
+            //     _conditions = conditionsString.Split(';').ToList();
+            // }
+            // catch
+            // {
+            //     throw new Exception("Invalid arguments");
+            // }
+            //
+            // if (!_conditions.Any())
+            // {
+            //     throw new Exception("Invalid arguments");
+            // }
         }
         public ConditionsCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
         {
@@ -39,24 +57,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Rewards = rewards;
             TimeToComplete = timeToComplete;
 
-            if (!parameters.TryGetValue(ConditionsParam, out var conditionsString))
-            {
-                throw new Exception("Invalid arguments");
-            }
-
-            try
-            {
-                _conditions = conditionsString.Split(';').ToList();
-            }
-            catch
-            {
-                throw new Exception("Invalid arguments");
-            }
-
-            if (!_conditions.Any())
-            {
-                throw new Exception("Invalid arguments");
-            }
+            Init();
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -66,8 +67,16 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
                 return false;
+
+
+            if (_conditions == null)
+                Init();
+
+            var conditions = campaignContext.Conditions.Where(t => _conditions.Contains(t.ConditionId)).ToList();
+            if (conditions.Count != _conditions.Count)
+                return false;
             
-            var passed = campaignContext.Conditions.All(conditionState => _conditions.Contains(conditionState.ConditionId) && conditionState.Status == ConditionStatus.Met);
+            var passed = conditions.All(conditionState => conditionState.Status == ConditionStatus.Met);
             if (passed)
             {
                 foreach (var reward in Rewards)
@@ -86,5 +95,27 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             { ConditionsParam, typeof(string).ToString() },
         };
+
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(ConditionsParam, out var conditionsString))
+            {
+                throw new Exception("Invalid arguments");
+            }
+
+            try
+            {
+                _conditions = conditionsString.Split(';').ToList();
+            }
+            catch
+            {
+                throw new Exception("Invalid arguments");
+            }
+
+            if (!_conditions.Any())
+            {
+                throw new Exception("Invalid arguments");
+            }
+        }
     }
 }

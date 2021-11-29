@@ -132,9 +132,6 @@ namespace Service.BonusCampaign.Worker.Jobs
                         var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == afterCondition.ConditionId);
                         if (conditionState != null)
                         {
-                            conditionState.Params =
-                                await afterCondition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
-                            
                             var result = await afterCondition.Check(update, _publisher, conditionState.Params, context);
                             
                             if (result)
