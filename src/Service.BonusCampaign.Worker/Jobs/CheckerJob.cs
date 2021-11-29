@@ -104,6 +104,12 @@ namespace Service.BonusCampaign.Worker.Jobs
                     .Include(condition => condition.Rewards)
                     .ToList();
 
+                var afterConditions = ctx.Conditions
+                    .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                        && condition.Type == ConditionType.ConditionsCondition)
+                    .Include(condition => condition.Rewards)
+                    .ToList();
+                
                 foreach (var context in contexts)
                 {
                     foreach (var condition in conditions)
@@ -115,6 +121,21 @@ namespace Service.BonusCampaign.Worker.Jobs
                                 await condition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
                             
                             var result = await condition.Check(update, _publisher, conditionState.Params, context);
+                            
+                            if (result)
+                                conditionState.Status = ConditionStatus.Met;
+                        }
+                    }
+
+                    foreach (var afterCondition in afterConditions)
+                    {
+                        var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == afterCondition.ConditionId);
+                        if (conditionState != null)
+                        {
+                            conditionState.Params =
+                                await afterCondition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
+                            
+                            var result = await afterCondition.Check(update, _publisher, conditionState.Params, context);
                             
                             if (result)
                                 conditionState.Status = ConditionStatus.Met;
