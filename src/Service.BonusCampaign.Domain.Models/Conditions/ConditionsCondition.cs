@@ -105,7 +105,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
             try
             {
-                _conditions = conditionsString.Split(';').ToList();
+                _conditions = conditionsString.Split(';').Select(t=>t.Trim()).ToList();
             }
             catch
             {
