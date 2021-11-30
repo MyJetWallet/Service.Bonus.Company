@@ -36,6 +36,8 @@ namespace Service.BonusCampaign
             app.ConfigureJetWallet(env, endpoints =>
             {
                 endpoints.MapGrpcSchema<CampaignManager, ICampaignManager>();
+                endpoints.MapGrpcSchema<CampaignRegistryService, ICampaignRegistry>();
+                endpoints.MapGrpcSchema<ClientContextService, IClientContextService>();
             });
         }
 

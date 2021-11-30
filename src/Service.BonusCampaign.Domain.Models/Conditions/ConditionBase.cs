@@ -23,7 +23,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract TimeSpan TimeToComplete { get; set; }
 
         public abstract Dictionary<string, string> GetParams();
-        public abstract Task<bool> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);
+        public abstract Task<ConditionStatus> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);
         public abstract Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient);
 
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
+using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Worker.Helpers;
 
@@ -15,11 +16,13 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly CampaignRepository _campaignRepository;
         private readonly MyTaskTimer _timer;
         private readonly ILogger<CampaignCheckerJob> _logger;
+        private readonly CampaignsRegistry _campaignsRegistry;
 
-        public CampaignCheckerJob(CampaignRepository campaignRepository, ILogger<CampaignCheckerJob> logger)
+        public CampaignCheckerJob(CampaignRepository campaignRepository, ILogger<CampaignCheckerJob> logger, CampaignsRegistry campaignsRegistry)
         {
             _campaignRepository = campaignRepository;
             _logger = logger;
+            _campaignsRegistry = campaignsRegistry;
             _timer = MyTaskTimer.Create<CampaignCheckerJob>(TimeSpan.FromSeconds(60), logger, DoProcess);
         }
 
@@ -40,6 +43,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                 campaign.Status = CampaignStatus.Finished;
             }
             await _campaignRepository.UpsertCampaign(finishedCampaigns);
+            await _campaignsRegistry.RemoveCampaignForAll(finishedCampaigns.Select(t=>t.Id).ToList());
             _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }
 

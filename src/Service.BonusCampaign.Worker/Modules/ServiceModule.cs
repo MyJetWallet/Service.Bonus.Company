@@ -2,6 +2,8 @@
 using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
+using Service.BonusCampaign.Domain;
+using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Worker.Helpers;
 using Service.BonusCampaign.Worker.Jobs;
 using Service.BonusClientContext.Domain.Models;
@@ -21,14 +23,23 @@ namespace Service.BonusCampaign.Worker.Modules
             builder.RegisterMyServiceBusPublisher<ExecuteRewardMessage>(spotServiceBusClient,
                 ExecuteRewardMessage.TopicName, false);
 
+            builder.RegisterMyNoSqlWriter<CampaignClientContextNoSqlEntity>(
+                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignClientContextNoSqlEntity.TableName);
+            
+            builder.RegisterMyNoSqlWriter<CampaignsRegistryNoSqlEntity>(
+                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignsRegistryNoSqlEntity.TableName);
+
             var myNoSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
             builder.RegisterConvertIndexPricesClient(myNoSqlClient);
-            
+
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             
             builder.RegisterType<CheckerJob>().AsSelf().AutoActivate().SingleInstance();
             builder.RegisterType<CampaignCheckerJob>().AsSelf().SingleInstance();
+
+            builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
+            builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
 
         }
     }

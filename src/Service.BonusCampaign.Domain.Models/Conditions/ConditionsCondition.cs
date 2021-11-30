@@ -15,7 +15,10 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
     public class ConditionsCondition : ConditionBase
     {
         private const string ConditionsParam = "ConditionsList";
+        private const string AllowExpiredParam = "AllowExpired";
+
         private List<string> _conditions;
+        private bool _allowExpired;
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.ConditionsCondition;
@@ -26,24 +29,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
         public ConditionsCondition()
         {
-            // if (!Parameters.TryGetValue(ConditionsParam, out var conditionsString))
-            // {
-            //     throw new Exception("Invalid arguments");
-            // }
-            //
-            // try
-            // {
-            //     _conditions = conditionsString.Split(';').ToList();
-            // }
-            // catch
-            // {
-            //     throw new Exception("Invalid arguments");
-            // }
-            //
-            // if (!_conditions.Any())
-            // {
-            //     throw new Exception("Invalid arguments");
-            // }
         }
         public ConditionsCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
         {
@@ -61,12 +46,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check(ContextUpdate context,
+        public override async Task<ConditionStatus> Check(ContextUpdate context,
             IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson,
             CampaignClientContext campaignContext)
         {
             if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
-                return false;
+                return ConditionStatus.Expired;
 
 
             if (_conditions == null)
@@ -74,19 +59,21 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
             var conditions = campaignContext.Conditions.Where(t => _conditions.Contains(t.ConditionId)).ToList();
             if (conditions.Count != _conditions.Count)
-                return false;
+                return ConditionStatus.NotMet;
             
-            var passed = conditions.All(conditionState => conditionState.Status == ConditionStatus.Met);
+            var passed = _allowExpired 
+                    ? conditions.All(conditionState => conditionState.Status != ConditionStatus.NotMet)
+                    : conditions.All(conditionState => conditionState.Status == ConditionStatus.Met);
             if (passed)
             {
                 foreach (var reward in Rewards)
                 {
                     await reward.ExecuteReward(context, publisher);
                 }
-                return true;
+                return ConditionStatus.Met;
             }
             
-            return false;
+            return ConditionStatus.NotMet;
         }
 
         public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);
@@ -94,6 +81,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
             { ConditionsParam, typeof(string).ToString() },
+            { AllowExpiredParam, typeof(bool).ToString() },
         };
 
         private void Init()
@@ -115,6 +103,11 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             if (!_conditions.Any())
             {
                 throw new Exception("Invalid arguments");
+            }
+
+            if (!Parameters.TryGetValue(AllowExpiredParam, out var kycStatus) && !bool.TryParse(kycStatus, out _allowExpired))
+            {
+                _allowExpired = false;
             }
         }
     }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
@@ -11,10 +12,12 @@ namespace Service.BonusCampaign.Worker.Helpers
     public class CampaignClientContextRepository
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
+        private readonly CampaignClientContextCacheManager _clientContextCache;
 
-        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextCacheManager clientContextCache)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            _clientContextCache = clientContextCache;
         }
         
         public async Task<List<CampaignClientContext>> GetContextById(string clientId)
@@ -49,6 +52,7 @@ namespace Service.BonusCampaign.Worker.Helpers
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(contexts);
             await ctx.UpsertAsync(contexts.SelectMany(t => t.Conditions));
+            await _clientContextCache.UpdateContext(contexts);
         }
     }
 }

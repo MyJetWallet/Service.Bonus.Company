@@ -17,6 +17,7 @@ namespace Service.BonusCampaign.Domain
                 case RewardType.ClientPaymentAbsolute:
                     return new ClientPaymentReward(parameters, rewardId, conditionId);
                 case RewardType.ReferrerPaymentAbsolute:
+                    return new ReferralPaymentReward(parameters, rewardId, conditionId);
                 case RewardType.ReferrerPaymentRelative:
                 case RewardType.ClientPaymentRelative:
                 default:
@@ -33,6 +34,7 @@ namespace Service.BonusCampaign.Domain
                 case RewardType.ClientPaymentAbsolute:
                     return ClientPaymentReward.ParamDictionary;
                 case RewardType.ReferrerPaymentAbsolute:
+                    return ReferralPaymentReward.ParamDictionary;
                 case RewardType.ReferrerPaymentRelative:
                 case RewardType.ClientPaymentRelative:
                 default:

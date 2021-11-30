@@ -17,5 +17,7 @@ namespace Service.BonusCampaign.Settings
         [YamlProperty("BonusCampaign.PostgresConnectionString")]
         public string PostgresConnectionString { get; set; }
         
+        [YamlProperty("BonusCampaign.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; set; }
     }
 }

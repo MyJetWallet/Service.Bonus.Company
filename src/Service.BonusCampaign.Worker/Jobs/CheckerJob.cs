@@ -28,8 +28,8 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly IServiceBusPublisher<ExecuteRewardMessage> _publisher;
         private readonly ILogger<CheckerJob> _logger;
         private readonly IConvertIndexPricesClient _pricesClient;
-
-        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger, IConvertIndexPricesClient pricesClient)
+        private readonly CampaignsRegistry _campaignsRegistry;
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger, IConvertIndexPricesClient pricesClient, CampaignsRegistry campaignsRegistry)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;
@@ -37,6 +37,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             _publisher = publisher;
             _logger = logger;
             _pricesClient = pricesClient;
+            _campaignsRegistry = campaignsRegistry;
             subscriber.Subscribe(HandleUpdates);
         }
 
@@ -77,6 +78,8 @@ namespace Service.BonusCampaign.Worker.Jobs
                                 Status = ConditionStatus.NotMet,
                             }).ToList()
                         });
+
+                        await _campaignsRegistry.AddCampaign(update.ClientId, campaign.Id);
                     }
                 }
 
@@ -120,10 +123,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                             conditionState.Params =
                                 await condition.UpdateConditionStateParams(update, conditionState.Params, _pricesClient);
                             
-                            var result = await condition.Check(update, _publisher, conditionState.Params, context);
-                            
-                            if (result)
-                                conditionState.Status = ConditionStatus.Met;
+                            conditionState.Status = await condition.Check(update, _publisher, conditionState.Params, context);
                         }
                     }
 
@@ -132,10 +132,7 @@ namespace Service.BonusCampaign.Worker.Jobs
                         var conditionState = context.Conditions.FirstOrDefault(t => t.ConditionId == afterCondition.ConditionId);
                         if (conditionState != null)
                         {
-                            var result = await afterCondition.Check(update, _publisher, conditionState.Params, context);
-                            
-                            if (result)
-                                conditionState.Status = ConditionStatus.Met;
+                            conditionState.Status = await afterCondition.Check(update, _publisher, conditionState.Params, context);
                         }
                     }
                 }

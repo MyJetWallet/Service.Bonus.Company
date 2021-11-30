@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Context;
+using Service.BonusCampaign.Domain.Models.Context.ParamsModels;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
@@ -50,24 +51,24 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check(ContextUpdate context,
+        public override async Task<ConditionStatus> Check(ContextUpdate context,
             IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson,
             CampaignClientContext campaignContext)
         {
             if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
-                return false;
+                return ConditionStatus.Expired;
             
             if (string.IsNullOrEmpty(paramsJson))
-                return false;
+                return ConditionStatus.NotMet;
 
-            ParamsModel model;
+            TradeParamsModel model;
             try
             {
-                model = JsonSerializer.Deserialize<ParamsModel>(paramsJson);
+                model = JsonSerializer.Deserialize<TradeParamsModel>(paramsJson);
             }
             catch (JsonException e)
             {
-                return false;
+                return ConditionStatus.NotMet;
             }
 
             if (model.TradeAmount >= _tradeAmount)
@@ -76,9 +77,9 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
                 {
                     await reward.ExecuteReward(context, publisher);
                 }
-                return true;
+                return ConditionStatus.Met;
             }
-            return false;
+            return ConditionStatus.NotMet;
         }
 
         public override async Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient)
@@ -86,11 +87,13 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.TradeEvent.ToAssetId, _tradeAsset);
             
             var model = string.IsNullOrWhiteSpace(paramsJson)
-                ? new ParamsModel
+                ? new TradeParamsModel
                 {
-                    TradeAmount = 0
+                    TradeAmount = 0,
+                    RequiredAmount = _tradeAmount,
+                    TradeAsset = _tradeAsset
                 }
-                : JsonSerializer.Deserialize<ParamsModel>(paramsJson);
+                : JsonSerializer.Deserialize<TradeParamsModel>(paramsJson);
             
             model.TradeAmount += context.TradeEvent.ToAmount * convertPrice.Price;
             return JsonSerializer.Serialize(model);
@@ -101,12 +104,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             { TradeAssetParam, typeof(string).ToString() },
             { TradeAmountParam, typeof(decimal).ToString() },
         };
-
-
-        private class ParamsModel
-        {
-            public decimal TradeAmount { get; set; }
-        }
-
+        
     }
 }

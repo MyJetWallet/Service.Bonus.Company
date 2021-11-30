@@ -9,38 +9,39 @@ using Service.BonusRewards.Domain.Models;
 
 namespace Service.BonusCampaign.Domain.Models.Rewards
 {
-    public class FeeShareReward : RewardBase
+    public class ReferralPaymentReward : RewardBase
     {
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
-            { FeeShareGroup, typeof(string).ToString() },
+            { AmountParam, typeof(decimal).ToString() },
+            { PaidAsset, typeof(string).ToString() },
         };
 
         public override Dictionary<string, string> Parameters { get; set; }
         public override string RewardId { get; set; }
         public override string ConditionId { get; set; }
         public override RewardType Type { get; set; }
+        
+        public ReferralPaymentReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
+        {
+            Type = RewardType.ReferrerPaymentAbsolute;
+            ConditionId = conditionId;
+            RewardId = rewardId ?? Guid.NewGuid().ToString("N");
+            Parameters = parameters;
+        }
+        
         public override Dictionary<string, string> GetParams() => ParamDictionary;
-
         public override async Task ExecuteReward(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher)
         {
             await publisher.PublishAsync(new ExecuteRewardMessage
             {
-                ClientId = context.ClientId,
-                RewardType = RewardType.FeeShareAssignment.ToString(),
-                FeeShareGroup = Parameters[FeeShareGroup],
+                ClientId = context.Context.ReferrerClientId,
+                RewardType = RewardType.ReferrerPaymentAbsolute.ToString(),
+                Asset = Parameters[PaidAsset],
+                AmountAbs = decimal.Parse(Parameters[AmountParam]),
                 RewardId = RewardId,
-                //TODO: context и condition прокинуть
             });
             Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
-        }
-        
-        public FeeShareReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
-        {
-            Type = RewardType.FeeShareAssignment;
-            ConditionId = conditionId;
-            RewardId = rewardId ?? Guid.NewGuid().ToString("N");
-            Parameters = parameters;
         }
     }
 }

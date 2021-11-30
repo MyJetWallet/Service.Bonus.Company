@@ -45,12 +45,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
-        public override async Task<bool> Check(ContextUpdate context,
+        public override async Task<ConditionStatus> Check(ContextUpdate context,
             IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson,
             CampaignClientContext campaignContext)
         {
             if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
-                return false;
+                return ConditionStatus.Expired;
             
             if (context.KycEvent != null && context.KycEvent.KycPassed)
             {
@@ -58,10 +58,10 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
                 {
                     await reward.ExecuteReward(context, publisher);
                 }
-                return true;
+                return ConditionStatus.Met;
             }
             
-            return false;
+            return ConditionStatus.NotMet;
         }
 
         public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);

@@ -4,6 +4,6 @@ namespace Service.BonusCampaign.Domain.Models.Enums
     {
         NotMet,
         Met,
-        RewardsPaid
+        Expired
     }
 }

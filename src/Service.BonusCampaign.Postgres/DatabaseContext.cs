@@ -119,15 +119,14 @@ namespace Service.BonusCampaign.Postgres
 
             modelBuilder.Entity<RewardBase>().HasDiscriminator(e => e.Type)
                 .HasValue<FeeShareReward>(RewardType.FeeShareAssignment)
-                .HasValue<ClientPaymentReward>(RewardType.ClientPaymentAbsolute);
+                .HasValue<ClientPaymentReward>(RewardType.ClientPaymentAbsolute)
+                .HasValue<ReferralPaymentReward>(RewardType.ReferrerPaymentAbsolute);
             
             modelBuilder.Entity<FeeShareReward>().HasBaseType<RewardBase>();
             modelBuilder.Entity<ClientPaymentReward>().HasBaseType<RewardBase>();
+            modelBuilder.Entity<ReferralPaymentReward>().HasBaseType<RewardBase>();
 
-            
             modelBuilder.Entity<RewardBase>().HasOne<ConditionBase>().WithMany(t => t.Rewards).HasForeignKey(t=>t.ConditionId);
-
-
         }
         
         private void SetContexts(ModelBuilder modelBuilder)
@@ -137,9 +136,6 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.CampaignId).HasMaxLength(128);           
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.ActivationTime).HasDefaultValue(DateTime.MinValue);
-
-            //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
-            
             modelBuilder.Entity<CampaignClientContext>().HasOne<Campaign>().WithMany(t => t.CampaignClientContexts).HasForeignKey(t=>t.CampaignId);
         }
 
@@ -150,7 +146,6 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ConditionId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.CampaignId).HasMaxLength(128);
-            //modelBuilder.Entity<CampaignClientContext>().Property(e => e.).HasColumnType("jsonb");
             
             modelBuilder.Entity<ClientConditionState>().HasOne<CampaignClientContext>().WithMany(t => t.Conditions).HasForeignKey(t=>new {t.ClientId, t.CampaignId});
         }

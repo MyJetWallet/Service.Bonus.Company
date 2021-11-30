@@ -22,5 +22,8 @@ namespace Service.BonusCampaign.Worker.Settings
         
         [YamlProperty("BonusCampaign.MyNoSqlReaderHostPort")]
         public string MyNoSqlReaderHostPort { get; set; }
+        
+        [YamlProperty("BonusCampaign.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; set; }
     }
 }
