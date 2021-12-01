@@ -3,6 +3,7 @@ using Autofac.Core;
 using Autofac.Core.Registration;
 using MyJetWallet.Sdk.NoSql;
 using Service.BonusCampaign.Domain;
+using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.NoSql;
 
 namespace Service.BonusCampaign.Modules
@@ -17,6 +18,8 @@ namespace Service.BonusCampaign.Modules
             builder.RegisterMyNoSqlWriter<CampaignsRegistryNoSqlEntity>(
                 Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignsRegistryNoSqlEntity.TableName);
             
+            builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
         }

@@ -30,7 +30,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
             Parameters = parameters;
         }
         
-        public override Dictionary<string, string> GetParams() => ParamDictionary;
+        public override Dictionary<string, string> GetParams() => Parameters;
         public override async Task ExecuteReward(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher)
         {
             await publisher.PublishAsync(new ExecuteRewardMessage

@@ -17,6 +17,9 @@ namespace Service.BonusCampaign.Client
             builder.RegisterInstance(factory.GetCampaignManager()).As<ICampaignManager>().SingleInstance();
             builder.RegisterInstance(factory.GetCampaignRegistry()).As<ICampaignRegistry>().SingleInstance();
             builder.RegisterInstance(factory.GetClientContextService()).As<IClientContextService>().SingleInstance();
+            
+            builder.RegisterInstance(factory.GetCampaignStatService()).As<ICampaignStatService>().SingleInstance();
+
         }
         
         public static void RegisterBonusCampaignNoSqlClient(this ContainerBuilder builder, string grpcServiceUrl, IMyNoSqlSubscriber myNoSqlSubscriber)
@@ -39,6 +42,8 @@ namespace Service.BonusCampaign.Client
             builder.RegisterInstance(factory.GetCampaignManager()).As<ICampaignManager>().SingleInstance();
             builder.RegisterInstance(factory.GetCampaignRegistry()).As<ICampaignRegistry>().SingleInstance();
             builder.RegisterInstance(factory.GetClientContextService()).As<IClientContextService>().SingleInstance();
+            
+            builder.RegisterInstance(factory.GetCampaignStatService()).As<ICampaignStatService>().SingleInstance();
         }
         
     }

@@ -41,4 +41,8 @@
       <ProjectReference Include="..\Service.BonusCampaign.Postgres\Service.BonusCampaign.Postgres.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helpers" />
+    </ItemGroup>
+
 </Project>

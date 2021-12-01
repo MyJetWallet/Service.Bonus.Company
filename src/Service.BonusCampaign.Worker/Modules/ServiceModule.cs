@@ -3,8 +3,8 @@ using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using Service.BonusCampaign.Domain;
+using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.NoSql;
-using Service.BonusCampaign.Worker.Helpers;
 using Service.BonusCampaign.Worker.Jobs;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
@@ -34,13 +34,11 @@ namespace Service.BonusCampaign.Worker.Modules
 
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
+            builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
             
             builder.RegisterType<CheckerJob>().AsSelf().AutoActivate().SingleInstance();
             builder.RegisterType<CampaignCheckerJob>().AsSelf().SingleInstance();
-
-            builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
-            builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
-
         }
     }
 }

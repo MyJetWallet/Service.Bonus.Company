@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using MyNoSqlServer.Abstractions;
 using Service.BonusCampaign.Domain.Models.NoSql;
 
-namespace Service.BonusCampaign.Domain
+namespace Service.BonusCampaign.Domain.Helpers
 {
     public class CampaignsRegistry
     {

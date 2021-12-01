@@ -19,6 +19,7 @@ namespace Service.BonusCampaign.Client
         }
 
         public ICampaignManager GetCampaignManager() => CreateGrpcService<ICampaignManager>();
+        public ICampaignStatService GetCampaignStatService() => CreateGrpcService<ICampaignStatService>();
 
         public ICampaignRegistry GetCampaignRegistry() => _campaignsReader != null
             ? new CampaignRegistryClient(_campaignsReader, CreateGrpcService<ICampaignRegistry>())

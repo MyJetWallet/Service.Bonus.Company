@@ -6,16 +6,17 @@ using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
 
-namespace Service.BonusCampaign.Worker.Helpers
+namespace Service.BonusCampaign.Domain.Helpers
 {
     public class CampaignRepository
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
+        private readonly CampaignsRegistry _campaignsRegistry;
 
-        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignsRegistry campaignsRegistry)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
-            
+            _campaignsRegistry = campaignsRegistry;
         }
 
         public async Task<List<Campaign>> GetCampaignsWithoutThisClient(string clientId)
@@ -32,11 +33,16 @@ namespace Service.BonusCampaign.Worker.Helpers
         public async Task<List<Campaign>> GetCampaigns()
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            
-            var t = await ctx.Campaigns.ToListAsync();
-            return t;
+            return await ctx.Campaigns.ToListAsync();
         }
 
+        public async Task<List<Campaign>> GetActiveCampaigns(string clientId)
+        {
+            var ids = await _campaignsRegistry.GetActiveCampaignsForClient(clientId);
+
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            return await ctx.Campaigns.Include(c=>c.Conditions).ThenInclude(t=>t.Rewards).Where(campaign=>ids.Contains(campaign.Id)).ToListAsync();
+        }
         public async Task UpsertCampaign(Campaign campaign)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);

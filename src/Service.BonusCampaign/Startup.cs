@@ -38,6 +38,7 @@ namespace Service.BonusCampaign
                 endpoints.MapGrpcSchema<CampaignManager, ICampaignManager>();
                 endpoints.MapGrpcSchema<CampaignRegistryService, ICampaignRegistry>();
                 endpoints.MapGrpcSchema<ClientContextService, IClientContextService>();
+                endpoints.MapGrpcSchema<CampaignStatService, ICampaignStatService>();
             });
         }
 

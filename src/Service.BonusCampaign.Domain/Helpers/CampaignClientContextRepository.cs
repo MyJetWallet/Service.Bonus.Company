@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
 
-namespace Service.BonusCampaign.Worker.Helpers
+namespace Service.BonusCampaign.Domain.Helpers
 {
     public class CampaignClientContextRepository
     {
@@ -31,7 +30,7 @@ namespace Service.BonusCampaign.Worker.Helpers
                 where campaign.Status == CampaignStatus.Active
                 select context;
 
-           return await query.Include(t=>t.Conditions).ToListAsync();
+           return await query.Include(t=>t.Conditions).ToListAsync(); //TODO: get from nosql
         }
         
         public async Task<List<CampaignClientContext>> GetContext()

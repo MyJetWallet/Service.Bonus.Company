@@ -6,6 +6,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Service.BonusCampaign.Domain.Models\Service.BonusCampaign.Domain.Models.csproj" />
+    <ProjectReference Include="..\Service.BonusCampaign.Postgres\Service.BonusCampaign.Postgres.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Factories" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
 </Project>

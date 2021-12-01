@@ -5,7 +5,7 @@ using MyNoSqlServer.Abstractions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.NoSql;
 
-namespace Service.BonusCampaign.Domain
+namespace Service.BonusCampaign.Domain.Helpers
 {
     public class CampaignClientContextCacheManager
     {

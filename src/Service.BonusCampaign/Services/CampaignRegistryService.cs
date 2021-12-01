@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Service.BonusCampaign.Domain;
+using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;

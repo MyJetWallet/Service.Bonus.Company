@@ -15,8 +15,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class TradeCondition : ConditionBase
     {
-        private const string TradeAssetParam = "TradeAsset";
-        private const string TradeAmountParam = "TradeAmountInSelectedAsset";
+        public const string TradeAssetParam = "TradeAsset";
+        public const string TradeAmountParam = "TradeAmountInSelectedAsset";
 
         private readonly string _tradeAsset;
         private readonly decimal _tradeAmount;
