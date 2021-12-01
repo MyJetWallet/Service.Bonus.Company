@@ -60,9 +60,9 @@ namespace Service.BonusCampaign.Services
                 
                 var stat = new CampaignStatModel
                 {
-                    Title = campaign.Name,
+                    Title = campaign.TitleTemplateId,
                     Description = "TODO: add description",
-                    TimeToComplete = default,
+                    ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
                     ImageUrl = "TODO: add image url",
                 };
@@ -140,6 +140,8 @@ namespace Service.BonusCampaign.Services
                     Asset = parameters[RewardBase.PaidAsset]
                 };
             }
+
+            DateTime GetExpirationTime(List<ClientConditionState> states) => states.Where(t => t.Status == ConditionStatus.NotMet && t.Type != ConditionType.ConditionsCondition).Min(t => t.ExpirationTime);
         }
     }
 }

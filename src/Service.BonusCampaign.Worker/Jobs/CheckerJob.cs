@@ -73,9 +73,12 @@ namespace Service.BonusCampaign.Worker.Jobs
                             ActivationTime = DateTime.UtcNow,
                             Conditions = campaign.Conditions.Select(condition => new ClientConditionState
                             {
-                                CampaignId = campaign.Id, ClientId = update.ClientId,
-                                ConditionId = condition.ConditionId, Type = condition.Type,
+                                CampaignId = campaign.Id, 
+                                ClientId = update.ClientId,
+                                ConditionId = condition.ConditionId, 
+                                Type = condition.Type,
                                 Status = ConditionStatus.NotMet,
+                                ExpirationTime = DateTime.UtcNow + condition.TimeToComplete
                             }).ToList()
                         });
 

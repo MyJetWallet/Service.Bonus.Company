@@ -50,12 +50,12 @@ namespace Service.BonusCampaign.Services
                 var campaign = new Campaign
                 {
                     Id = campaignId,
-                    Name = request.Name,
+                    TitleTemplateId = request.TitleTemplateId,
                     FromDateTime = request.FromDateTime,
                     ToDateTime = request.ToDateTime,
                     IsEnabled = request.IsEnabled,
                     Status = CampaignStatus.Scheduled,
-                    BannerId = request.BannerId,
+                    ImageUrl = request.ImageUrl,
                     CriteriaList = criteriaList,
                     Conditions = conditions
                 };

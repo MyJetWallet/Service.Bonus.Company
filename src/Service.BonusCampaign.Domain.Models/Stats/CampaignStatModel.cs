@@ -10,7 +10,7 @@ namespace Service.BonusCampaign.Domain.Models.Stats
     {
         [DataMember(Order = 1)]public string Title { get; set; }
         [DataMember(Order = 2)]public string Description { get; set; }
-        [DataMember(Order = 3)]public TimeSpan TimeToComplete { get; set; }
+        [DataMember(Order = 3)]public DateTime ExpirationTime { get; set; }
         [DataMember(Order = 4)]public List<ConditionStatModel> Conditions { get; set; }
         [DataMember(Order = 5)]public string ImageUrl { get; set; }
     }

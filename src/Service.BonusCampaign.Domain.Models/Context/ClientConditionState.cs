@@ -1,3 +1,4 @@
+using System;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Enums;
 
@@ -11,5 +12,6 @@ namespace Service.BonusCampaign.Domain.Models.Context
         public ConditionType Type { get; set; }
         public ConditionStatus Status { get; set; }
         public string Params { get; set; }
+        public DateTime ExpirationTime { get; set; }
     }
 }

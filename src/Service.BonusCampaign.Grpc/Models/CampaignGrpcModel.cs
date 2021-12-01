@@ -16,15 +16,17 @@ namespace Service.BonusCampaign.Grpc.Models
     public class CampaignGrpcModel
     {
         [DataMember(Order = 1)] public string Id { get; set; }
-        [DataMember(Order = 2)] public string Name { get; set; }
+        [DataMember(Order = 2)] public string TitleTemplateId { get; set; }
         [DataMember(Order = 3)] public DateTime FromDateTime { get; set; }
         [DataMember(Order = 4)] public DateTime ToDateTime { get; set; }
         [DataMember(Order = 5)] public bool IsEnabled { get; set; }
         [DataMember(Order = 6)] public CampaignStatus Status { get; set; }
-        [DataMember(Order = 7)] public string BannerId { get; set; }
+        [DataMember(Order = 7)] public string ImageUrl { get; set; }
         [DataMember(Order = 8)] public List<AccessCriteriaGrpcModel> CriteriaList { get; set; }
         [DataMember(Order = 9)] public List<ConditionGrpcModel> Conditions { get; set; }
         [DataMember(Order = 10)] public List<CampaignClientContextGrpcModel> Contexts { get; set; }
+        [DataMember(Order = 11)] public string DescriptionTemplateId { get; set; }
+
     }
 
     [DataContract]
@@ -73,6 +75,7 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 3)] public string ConditionId { get; set; }
         [DataMember(Order = 4)] public ConditionType Type { get; set; }
         [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
+        [DataMember(Order = 6)] public DateTime ExpirationTime { get; set; }
     }
 
     public static class CampaignExtensions
@@ -85,7 +88,8 @@ namespace Service.BonusCampaign.Grpc.Models
                 CampaignId = conditionState.CampaignId,
                 ConditionId = conditionState.ConditionId,
                 Type = conditionState.Type,
-                Status = conditionState.Status
+                Status = conditionState.Status,
+                ExpirationTime = conditionState.ExpirationTime
             };
         }
 
@@ -138,12 +142,13 @@ namespace Service.BonusCampaign.Grpc.Models
             return new CampaignGrpcModel
             {
                 Id = campaign.Id,
-                Name = campaign.Name,
+                TitleTemplateId = campaign.TitleTemplateId,
+                DescriptionTemplateId = campaign.DescriptionTemplateId,
                 FromDateTime = campaign.FromDateTime,
                 ToDateTime = campaign.ToDateTime,
                 IsEnabled = campaign.IsEnabled,
                 Status = campaign.Status,
-                BannerId = campaign.BannerId,
+                ImageUrl = campaign.ImageUrl,
                 CriteriaList = campaign.CriteriaList?.Select(ToGrpcModel).ToList() ?? new (),
                 Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new (),
                 Contexts = campaign.CampaignClientContexts?.Select(ToGrpcModel).ToList() ?? new (),

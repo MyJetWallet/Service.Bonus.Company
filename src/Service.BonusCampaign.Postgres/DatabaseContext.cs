@@ -58,10 +58,10 @@ namespace Service.BonusCampaign.Postgres
         {
             modelBuilder.Entity<Campaign>().ToTable(CampaignsTableName);
             modelBuilder.Entity<Campaign>().HasKey(e => e.Id);
-            modelBuilder.Entity<Campaign>().Property(e => e.Name).HasMaxLength(2048);
+            modelBuilder.Entity<Campaign>().Property(e => e.TitleTemplateId).HasMaxLength(2048);
             modelBuilder.Entity<Campaign>().Property(e => e.Status);
             modelBuilder.Entity<Campaign>().Property(e => e.IsEnabled);
-            modelBuilder.Entity<Campaign>().Property(e => e.BannerId).HasMaxLength(128);
+            modelBuilder.Entity<Campaign>().Property(e => e.ImageUrl).HasMaxLength(128);
             modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime).HasDefaultValue(DateTime.MinValue);
             modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime).HasDefaultValue(DateTime.MinValue);
 
@@ -146,7 +146,8 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ConditionId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.CampaignId).HasMaxLength(128);
-            
+            modelBuilder.Entity<ClientConditionState>().Property(e => e.ExpirationTime).HasDefaultValue(DateTime.MinValue);
+
             modelBuilder.Entity<ClientConditionState>().HasOne<CampaignClientContext>().WithMany(t => t.Conditions).HasForeignKey(t=>new {t.ClientId, t.CampaignId});
         }
         
