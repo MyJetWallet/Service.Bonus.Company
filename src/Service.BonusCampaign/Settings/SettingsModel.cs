@@ -19,5 +19,12 @@ namespace Service.BonusCampaign.Settings
         
         [YamlProperty("BonusCampaign.MyNoSqlWriterUrl")]
         public string MyNoSqlWriterUrl { get; set; }
+        
+        [YamlProperty("BonusCampaign.MyNoSqlReaderHostPort")]
+        public string MyNoSqlReaderHostPort { get; set; }
+        
+        [YamlProperty("BonusCampaign.MessageTemplatesGrpcServiceUrl")]
+        public string MessageTemplatesGrpcServiceUrl { get; set; }
+        
     }
 }

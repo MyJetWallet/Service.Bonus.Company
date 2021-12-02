@@ -15,6 +15,7 @@ using Service.BonusCampaign.Domain.Models.Stats;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
 using Service.BonusCampaign.Postgres;
+using Service.MessageTemplates.Client;
 
 namespace Service.BonusCampaign.Services
 {
@@ -23,11 +24,13 @@ namespace Service.BonusCampaign.Services
         private readonly ILogger<CampaignStatService> _logger;
         private readonly CampaignClientContextRepository _contextRepository;
         private readonly CampaignRepository _campaignRepository;
-        public CampaignStatService(CampaignClientContextRepository contextRepository, ILogger<CampaignStatService> logger, CampaignRepository campaignRepository)
+        private readonly ITemplateClient _templateClient;
+        public CampaignStatService(CampaignClientContextRepository contextRepository, ILogger<CampaignStatService> logger, CampaignRepository campaignRepository, ITemplateClient templateClient)
         {
             _contextRepository = contextRepository;
             _logger = logger;
             _campaignRepository = campaignRepository;
+            _templateClient = templateClient;
         }
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
@@ -60,11 +63,11 @@ namespace Service.BonusCampaign.Services
                 
                 var stat = new CampaignStatModel
                 {
-                    Title = campaign.TitleTemplateId,
-                    Description = "TODO: add description",
+                    Title = await _templateClient.GetTemplateBody(campaign.TitleTemplateId, request.Brand, request.Lang),
+                    Description =  await _templateClient.GetTemplateBody(campaign.DescriptionTemplateId, request.Brand, request.Lang),
                     ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
-                    ImageUrl = "TODO: add image url",
+                    ImageUrl = campaign.TitleTemplateId,
                 };
                 
                 stats.Add(stat);
