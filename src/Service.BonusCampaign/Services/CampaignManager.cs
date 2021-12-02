@@ -51,10 +51,11 @@ namespace Service.BonusCampaign.Services
                 {
                     Id = campaignId,
                     TitleTemplateId = request.TitleTemplateId,
+                    DescriptionTemplateId = request.DescriptionTemplateId,
                     FromDateTime = request.FromDateTime,
                     ToDateTime = request.ToDateTime,
                     IsEnabled = request.IsEnabled,
-                    Status = CampaignStatus.Scheduled,
+                    Status = request.Status,
                     ImageUrl = request.ImageUrl,
                     CriteriaList = criteriaList,
                     Conditions = conditions
