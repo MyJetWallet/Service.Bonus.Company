@@ -26,5 +26,16 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract Task<ConditionStatus> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);
         public abstract Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient);
 
+        protected bool IsExpired(DateTime activationTime)
+        {
+            if (TimeToComplete == TimeSpan.Zero)
+                return false;
+            
+            if (activationTime + TimeToComplete <= DateTime.UtcNow)
+                return true;
+            
+            return false;
+        }
+
     }
 }

@@ -50,9 +50,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson,
             CampaignClientContext campaignContext)
         {
-            if (campaignContext.ActivationTime + TimeToComplete <= DateTime.UtcNow)
+            if (IsExpired(campaignContext.ActivationTime))
                 return ConditionStatus.Expired;
-
 
             if (_conditions == null)
                 Init();
