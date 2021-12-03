@@ -21,6 +21,10 @@ namespace Service.BonusCampaign.Domain.Helpers
         
         public async Task<List<CampaignClientContext>> GetContextById(string clientId)
         {
+            var cached = await _clientContextCache.GetActiveContextsByClient(clientId);
+            if (cached.Any())
+                return cached;
+            
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             var query =
                 from context in ctx.CampaignClientContexts
@@ -30,20 +34,7 @@ namespace Service.BonusCampaign.Domain.Helpers
                 where campaign.Status == CampaignStatus.Active
                 select context;
 
-           return await query.Include(t=>t.Conditions).ToListAsync(); //TODO: get from nosql
-        }
-        
-        public async Task<List<CampaignClientContext>> GetContext()
-        {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            return await ctx.CampaignClientContexts.ToListAsync();
-        }
-
-        public async Task UpsertContext(CampaignClientContext context)
-        {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            await ctx.UpsertAsync(new[] { context });
-            await ctx.UpsertAsync(context.Conditions);
+           return await query.Include(t=>t.Conditions).ToListAsync();
         }
         
         public async Task UpsertContext(List<CampaignClientContext> contexts)
