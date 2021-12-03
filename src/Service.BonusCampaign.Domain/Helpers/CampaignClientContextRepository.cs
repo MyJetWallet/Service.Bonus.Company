@@ -22,7 +22,7 @@ namespace Service.BonusCampaign.Domain.Helpers
         public async Task<List<CampaignClientContext>> GetContextById(string clientId)
         {
             var cached = await _clientContextCache.GetActiveContextsByClient(clientId);
-            if (cached.Any())
+            if (cached != null)
                 return cached;
             
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
