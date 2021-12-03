@@ -104,6 +104,5 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             { TradeAssetParam, typeof(string).ToString() },
             { TradeAmountParam, typeof(decimal).ToString() },
         };
-        
     }
 }

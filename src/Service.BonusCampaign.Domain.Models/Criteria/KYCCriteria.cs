@@ -9,7 +9,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
     public class KycCriteria : AccessCriteriaBase
     {
         private const string KycParam = "KYCPassed";
-        private readonly bool _kycStatus;
+        private bool _kycStatus;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
@@ -21,15 +21,13 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             CampaignId = campaignId;
             CriteriaType = CriteriaType.KycType;
             Parameters = parameters;
-            if (!parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))
-            {
-                throw new Exception("Invalid arguments");
-            }
+            Init();
         }
 
 
         public override Task<bool> Check(ClientContext context)
         {
+            Init();
             return Task.FromResult(context.KYCDone == _kycStatus);
         }
 
@@ -39,5 +37,13 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         {
             { KycParam, typeof(bool).ToString() },
         };
+        
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))
+            {
+                throw new Exception("Invalid arguments");
+            }
+        }
     }
 }

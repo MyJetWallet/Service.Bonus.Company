@@ -9,7 +9,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
     public class ReferralCriteria : AccessCriteriaBase
     {
         private const string ReferralParam = "HasReferral";
-        private readonly bool _hasReferral;
+        private bool _hasReferral;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
@@ -21,15 +21,13 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             CampaignId = campaignId;
             CriteriaType = CriteriaType.ReferralType;
             Parameters = parameters;
-            if (!parameters.TryGetValue(ReferralParam, out var hasReferral) && !bool.TryParse(hasReferral, out _hasReferral))
-            {
-                throw new Exception("Invalid arguments");
-            }
+            Init();
         }
 
 
         public override Task<bool> Check(ClientContext context)
         {
+            Init();
             return Task.FromResult(string.IsNullOrWhiteSpace(context.ReferrerClientId) != _hasReferral);
         }
 
@@ -39,5 +37,13 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         {
             { ReferralParam, typeof(bool).ToString() },
         };
+
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(ReferralParam, out var hasReferral) || !bool.TryParse(hasReferral.ToLower(), out _hasReferral))
+            {
+                throw new Exception("Invalid arguments");
+            }
+        }
     }
 }

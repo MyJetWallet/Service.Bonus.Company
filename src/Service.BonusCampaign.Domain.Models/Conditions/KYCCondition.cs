@@ -14,7 +14,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
     public class KycCondition : ConditionBase
     {
         private const string KycParam = "KYCPassed";
-        private readonly bool _kycStatus;
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.KYCCondition;
@@ -37,11 +36,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
-
-            if (!parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))
-            {
-                throw new Exception("Invalid arguments");
-            }
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;

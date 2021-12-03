@@ -14,7 +14,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
     public class DepositCondition : ConditionBase
     {
         private const string DepositParam = "DepositMade";
-        private readonly bool _depositMade;
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.DepositCondition;
@@ -37,11 +36,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
-
-            if (!parameters.TryGetValue(DepositParam, out var depositMade) && !bool.TryParse(depositMade, out _depositMade))
-            {
-                throw new Exception("Invalid arguments");
-            }
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -70,5 +64,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             { DepositParam, typeof(bool).ToString() },
         };
+        
     }
 }
