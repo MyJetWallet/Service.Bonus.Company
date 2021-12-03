@@ -40,16 +40,16 @@ namespace Service.BonusCampaign.Services
 
             var ids = campaigns.Select(t => t.Id).ToList();
             contexts = contexts.Where(t => ids.Contains(t.CampaignId)).ToList();
-            
+
             var conditions = campaigns
                 .SelectMany(t => t.Conditions)
                 .ToList();
-            
+
             var rewards = conditions
                 .SelectMany(t => t.Rewards)
                 .Where(t => t.Type == RewardType.ClientPaymentAbsolute)
                 .ToList();
-            
+
             var stats = new List<CampaignStatModel>();
 
             foreach (var context in contexts)
@@ -60,16 +60,18 @@ namespace Service.BonusCampaign.Services
                     .Where(t => t.Type != ConditionType.ConditionsCondition)
                     .Select(condition => GetConditionStat(condition, rewards))
                     .ToList();
-                
+
                 var stat = new CampaignStatModel
                 {
-                    Title = await _templateClient.GetTemplateBody(campaign.TitleTemplateId, request.Brand, request.Lang),
-                    Description =  await _templateClient.GetTemplateBody(campaign.DescriptionTemplateId, request.Brand, request.Lang),
+                    Title =
+                        await _templateClient.GetTemplateBody(campaign.TitleTemplateId, request.Brand, request.Lang),
+                    Description = await _templateClient.GetTemplateBody(campaign.DescriptionTemplateId, request.Brand,
+                        request.Lang),
                     ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
                     ImageUrl = campaign.TitleTemplateId,
                 };
-                
+
                 stats.Add(stat);
             }
 
@@ -87,8 +89,9 @@ namespace Service.BonusCampaign.Services
                         return new ConditionStatModel
                         {
                             Type = ConditionType.KYCCondition,
-                            Params = new Dictionary<string, string>(){{"Passed", (state.Status == ConditionStatus.Met).ToString()}},
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t=>t.ConditionId == state.ConditionId))
+                            Params = new Dictionary<string, string>()
+                                { { "Passed", (state.Status == ConditionStatus.Met).ToString() } },
+                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     case ConditionType.TradeCondition:
                     {
@@ -115,16 +118,21 @@ namespace Service.BonusCampaign.Services
                         {
                             Type = ConditionType.TradeCondition,
                             Params = new Dictionary<string, string>()
-                                { { "Asset", paramsModel.TradeAsset }, { "RequiredAmount", paramsModel.RequiredAmount.ToString() }, { "TradedAmount", paramsModel.TradeAmount.ToString() } },
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t=>t.ConditionId == state.ConditionId))
+                            {
+                                { "Asset", paramsModel.TradeAsset },
+                                { "RequiredAmount", paramsModel.RequiredAmount.ToString() },
+                                { "TradedAmount", paramsModel.TradeAmount.ToString() }
+                            },
+                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     }
                     case ConditionType.DepositCondition:
                         return new ConditionStatModel
                         {
                             Type = ConditionType.DepositCondition,
-                            Params = new Dictionary<string, string>(){{"Passed", (state.Status == ConditionStatus.Met).ToString()}},
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t=>t.ConditionId == state.ConditionId))
+                            Params = new Dictionary<string, string>()
+                                { { "Passed", (state.Status == ConditionStatus.Met).ToString() } },
+                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     default:
                         return null;
@@ -133,9 +141,9 @@ namespace Service.BonusCampaign.Services
 
             RewardStatModel GetRewardStat(RewardBase reward)
             {
-                if (reward == null) 
+                if (reward == null)
                     return null;
-                
+
                 var parameters = reward.GetParams();
                 return new RewardStatModel
                 {
@@ -144,7 +152,14 @@ namespace Service.BonusCampaign.Services
                 };
             }
 
-            DateTime GetExpirationTime(List<ClientConditionState> states) => states.Where(t => t.Status == ConditionStatus.NotMet && t.Type != ConditionType.ConditionsCondition).Min(t => t.ExpirationTime);
+            DateTime GetExpirationTime(List<ClientConditionState> states)
+            { 
+                var notMetStates = states.Where(t =>
+                    t.Status == ConditionStatus.NotMet 
+                    && t.Type != ConditionType.ConditionsCondition).ToList();
+                    
+                return notMetStates.Any() ? notMetStates.Min(t=>t.ExpirationTime) : DateTime.MinValue;
+            }
         }
     }
 }
