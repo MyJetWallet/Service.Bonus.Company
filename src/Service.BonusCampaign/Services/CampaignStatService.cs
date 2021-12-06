@@ -121,7 +121,8 @@ namespace Service.BonusCampaign.Services
                             {
                                 { "Asset", paramsModel.TradeAsset },
                                 { "RequiredAmount", paramsModel.RequiredAmount.ToString() },
-                                { "TradedAmount", paramsModel.TradeAmount.ToString() }
+                                { "TradedAmount", paramsModel.TradeAmount.ToString() },
+                                { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }
                             },
                             Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
