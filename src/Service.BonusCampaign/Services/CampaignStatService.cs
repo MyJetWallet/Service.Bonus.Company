@@ -90,7 +90,7 @@ namespace Service.BonusCampaign.Services
                         {
                             Type = ConditionType.KYCCondition,
                             Params = new Dictionary<string, string>()
-                                { { "Passed", (state.Status == ConditionStatus.Met).ToString() } },
+                                { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  } },
                             Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     case ConditionType.TradeCondition:
@@ -131,7 +131,7 @@ namespace Service.BonusCampaign.Services
                         {
                             Type = ConditionType.DepositCondition,
                             Params = new Dictionary<string, string>()
-                                { { "Passed", (state.Status == ConditionStatus.Met).ToString() } },
+                                { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower() } },
                             Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     default:
