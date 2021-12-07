@@ -3,6 +3,7 @@ using MyNoSqlServer.Abstractions;
 using MyNoSqlServer.DataReader;
 using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Grpc;
+using Service.MessageTemplates.Client;
 
 // ReSharper disable UnusedMember.Global
 
@@ -12,22 +13,19 @@ namespace Service.BonusCampaign.Client
     {
         public static void RegisterBonusCampaignClient(this ContainerBuilder builder, string grpcServiceUrl)
         {
-            var factory = new BonusCampaignClientFactory(grpcServiceUrl, null, null);
+            var factory = new BonusCampaignClientFactory(grpcServiceUrl, null, null, null);
 
             builder.RegisterInstance(factory.GetCampaignManager()).As<ICampaignManager>().SingleInstance();
-            builder.RegisterInstance(factory.GetCampaignRegistry()).As<ICampaignRegistry>().SingleInstance();
             builder.RegisterInstance(factory.GetClientContextService()).As<IClientContextService>().SingleInstance();
-            
             builder.RegisterInstance(factory.GetCampaignStatService()).As<ICampaignStatService>().SingleInstance();
-
         }
         
-        public static void RegisterBonusCampaignNoSqlClient(this ContainerBuilder builder, string grpcServiceUrl, IMyNoSqlSubscriber myNoSqlSubscriber)
+        public static void RegisterBonusCampaignNoSqlClient(this ContainerBuilder builder, string grpcServiceUrl, IMyNoSqlSubscriber myNoSqlSubscriber, ITemplateClient templateClient)
         {
             var contextSubs = new MyNoSqlReadRepository<CampaignClientContextNoSqlEntity>(myNoSqlSubscriber, CampaignClientContextNoSqlEntity.TableName);
-            var campaignSubs = new MyNoSqlReadRepository<CampaignsRegistryNoSqlEntity>(myNoSqlSubscriber, CampaignsRegistryNoSqlEntity.TableName);
+            var campaignSubs = new MyNoSqlReadRepository<CampaignNoSqlEntity>(myNoSqlSubscriber, CampaignNoSqlEntity.TableName);
 
-            var factory = new BonusCampaignClientFactory(grpcServiceUrl, contextSubs, campaignSubs);
+            var factory = new BonusCampaignClientFactory(grpcServiceUrl, contextSubs, campaignSubs, templateClient);
 
             builder
                 .RegisterInstance(contextSubs)
@@ -36,13 +34,11 @@ namespace Service.BonusCampaign.Client
             
             builder
                 .RegisterInstance(campaignSubs)
-                .As<IMyNoSqlServerDataReader<CampaignsRegistryNoSqlEntity>>()
+                .As<IMyNoSqlServerDataReader<CampaignNoSqlEntity>>()
                 .SingleInstance();
             
             builder.RegisterInstance(factory.GetCampaignManager()).As<ICampaignManager>().SingleInstance();
-            builder.RegisterInstance(factory.GetCampaignRegistry()).As<ICampaignRegistry>().SingleInstance();
             builder.RegisterInstance(factory.GetClientContextService()).As<IClientContextService>().SingleInstance();
-            
             builder.RegisterInstance(factory.GetCampaignStatService()).As<ICampaignStatService>().SingleInstance();
         }
         

@@ -28,21 +28,20 @@ namespace Service.BonusCampaign.Worker.Jobs
 
         private async Task DoProcess()
         {
-            _logger.LogInformation("Checking campaign statuses");
             var campaigns = await _campaignRepository.GetCampaigns();
             var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
             foreach (var campaign in activeCampaigns)
             {
                 campaign.Status = CampaignStatus.Active;
             }
-            await _campaignRepository.UpsertCampaign(activeCampaigns);
+            await _campaignRepository.SetActiveCampaigns(activeCampaigns);
             
             var finishedCampaigns = campaigns.Where(t => t.ToDateTime <= DateTime.UtcNow && t.Status != CampaignStatus.Finished).ToList();
             foreach (var campaign in finishedCampaigns)
             {
                 campaign.Status = CampaignStatus.Finished;
             }
-            await _campaignRepository.UpsertCampaign(finishedCampaigns);
+            await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
             await _campaignsRegistry.RemoveCampaignForAll(finishedCampaigns.Select(t=>t.Id).ToList());
             _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }

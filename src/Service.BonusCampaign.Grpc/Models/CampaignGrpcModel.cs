@@ -76,6 +76,8 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 4)] public ConditionType Type { get; set; }
         [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
         [DataMember(Order = 6)] public DateTime ExpirationTime { get; set; }
+        [DataMember(Order = 7)] public string Params { get; set; }
+
     }
 
     public static class CampaignExtensions
@@ -89,7 +91,8 @@ namespace Service.BonusCampaign.Grpc.Models
                 ConditionId = conditionState.ConditionId,
                 Type = conditionState.Type,
                 Status = conditionState.Status,
-                ExpirationTime = conditionState.ExpirationTime
+                ExpirationTime = conditionState.ExpirationTime,
+                Params = conditionState.Params
             };
         }
 

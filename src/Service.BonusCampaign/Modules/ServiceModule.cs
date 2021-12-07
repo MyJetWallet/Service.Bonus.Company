@@ -19,6 +19,9 @@ namespace Service.BonusCampaign.Modules
             
             builder.RegisterMyNoSqlWriter<CampaignsRegistryNoSqlEntity>(
                 Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignsRegistryNoSqlEntity.TableName);
+           
+            builder.RegisterMyNoSqlWriter<CampaignNoSqlEntity>(
+                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignNoSqlEntity.TableName);
             
             builder.RegisterMessageTemplatesCachedClient(Program.Settings.MessageTemplatesGrpcServiceUrl, noSqlClient);
             
