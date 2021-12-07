@@ -14,6 +14,7 @@ namespace Service.BonusCampaign.Domain.Models.Stats
         [DataMember(Order = 4)]public List<ConditionStatModel> Conditions { get; set; }
         [DataMember(Order = 5)]public string ImageUrl { get; set; }
         [DataMember(Order = 6)]public string CampaignId { get; set; }
+        [DataMember(Order = 7)]public string DeepLink { get; set; }
     }
 
     [DataContract]

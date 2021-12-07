@@ -70,7 +70,8 @@ namespace Service.BonusCampaign.Services
                     ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
-                    CampaignId = campaign.Id
+                    CampaignId = campaign.Id,
+                    DeepLink = "https://jetwallet.page.link/?link=https%3a%2f%2fgoogle.com%3fcode%3d777%26jw_command%3dInviteFriend%26&apn=com.example.flutter_jetwallet&ibi=newapp.trading",
                 };
 
                 stats.Add(stat);
