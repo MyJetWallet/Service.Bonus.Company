@@ -69,7 +69,8 @@ namespace Service.BonusCampaign.Services
                         request.Lang),
                     ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
-                    ImageUrl = campaign.TitleTemplateId,
+                    ImageUrl = campaign.ImageUrl,
+                    CampaignId = campaign.Id
                 };
 
                 stats.Add(stat);

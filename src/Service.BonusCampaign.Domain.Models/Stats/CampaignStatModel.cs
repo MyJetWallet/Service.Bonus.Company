@@ -13,6 +13,7 @@ namespace Service.BonusCampaign.Domain.Models.Stats
         [DataMember(Order = 3)]public DateTime ExpirationTime { get; set; }
         [DataMember(Order = 4)]public List<ConditionStatModel> Conditions { get; set; }
         [DataMember(Order = 5)]public string ImageUrl { get; set; }
+        [DataMember(Order = 6)]public string CampaignId { get; set; }
     }
 
     [DataContract]
