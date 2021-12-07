@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
 using Service.BonusCampaign.Postgres;

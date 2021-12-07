@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
-using Service.BonusClientContext.Domain.Models;
 
-namespace Service.BonusCampaign.Grpc.Models
+namespace Service.BonusCampaign.Domain.Models.GrpcModels
 {
     [DataContract]
     public class CampaignGrpcModel
@@ -56,6 +54,8 @@ namespace Service.BonusCampaign.Grpc.Models
         [DataMember(Order = 1)] public string RewardId { get; set; }
         [DataMember(Order = 2)] public RewardType Type { get; set; }
         [DataMember(Order = 3)] public Dictionary<string, string> Parameters { get; set; }
+        [DataMember(Order = 4)] public string ConditionId { get; set; }
+
     }
     
     [DataContract]
@@ -113,7 +113,8 @@ namespace Service.BonusCampaign.Grpc.Models
             {
                 RewardId = rewardBase.RewardId,
                 Type = rewardBase.Type,
-                Parameters = rewardBase.Parameters
+                Parameters = rewardBase.Parameters,
+                ConditionId = rewardBase.ConditionId
             };
         }
         

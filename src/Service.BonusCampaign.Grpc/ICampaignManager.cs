@@ -1,5 +1,6 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Grpc.Models;
 
 namespace Service.BonusCampaign.Grpc

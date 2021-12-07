@@ -18,8 +18,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public const string TradeAssetParam = "TradeAsset";
         public const string TradeAmountParam = "TradeAmountInSelectedAsset";
 
-        private readonly string _tradeAsset;
-        private readonly decimal _tradeAmount;
+        private string _tradeAsset;
+        private decimal _tradeAmount;
 
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
@@ -43,11 +43,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
-            
-            if (!parameters.TryGetValue(TradeAmountParam, out var tradeAmount) || !decimal.TryParse(tradeAmount, out _tradeAmount) || !parameters.TryGetValue(TradeAssetParam, out _tradeAsset) || string.IsNullOrWhiteSpace(_tradeAsset))
-            {
-                throw new Exception("Invalid arguments");
-            }
+
+            Init();
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -61,6 +58,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             if (string.IsNullOrEmpty(paramsJson))
                 return ConditionStatus.NotMet;
 
+            Init();
             TradeParamsModel model;
             try
             {
@@ -84,6 +82,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
         public override async Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient)
         {
+            Init();
             var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.TradeEvent.ToAssetId, _tradeAsset);
             
             var model = string.IsNullOrWhiteSpace(paramsJson)
@@ -104,5 +103,13 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             { TradeAssetParam, typeof(string).ToString() },
             { TradeAmountParam, typeof(decimal).ToString() },
         };
+
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(TradeAmountParam, out var tradeAmount) || !decimal.TryParse(tradeAmount, out _tradeAmount) || !Parameters.TryGetValue(TradeAssetParam, out _tradeAsset) || string.IsNullOrWhiteSpace(_tradeAsset))
+            {
+                throw new Exception("Invalid arguments");
+            }
+        }
     }
 }

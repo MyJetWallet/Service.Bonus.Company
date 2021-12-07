@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 
 namespace Service.BonusCampaign.Grpc.Models
 {

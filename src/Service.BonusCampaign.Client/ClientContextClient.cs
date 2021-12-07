@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MyNoSqlServer.DataReader;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;

@@ -9,6 +9,7 @@ using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Context.ParamsModels;
 using Service.BonusCampaign.Domain.Models.Enums;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusCampaign.Domain.Models.Stats;
@@ -33,7 +34,7 @@ namespace Service.BonusCampaign.Client
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
         {
-            var campaigns = _campaignReader.Get().Select(t=>t.Campaign).Where(campaign=>campaign.CampaignClientContexts.Any(context=>context.ClientId == request.ClientId)).ToList();
+            var campaigns = _campaignReader.Get().Select(t=>t.Campaign).Where(campaign=>campaign.Contexts.Any(context=>context.ClientId == request.ClientId)).ToList();
             var contextResponse = await _contextClient.GetContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
 
             var ids = campaigns.Select(t => t.Id).ToList();
@@ -81,7 +82,7 @@ namespace Service.BonusCampaign.Client
             };
 
             //locals 
-            ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardBase> rewards)
+            ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewards)
             {
                 switch (state.Type)
                 {
@@ -140,12 +141,12 @@ namespace Service.BonusCampaign.Client
                 }
             }
 
-            RewardStatModel GetRewardStat(RewardBase reward)
+            RewardStatModel GetRewardStat(RewardGrpcModel reward)
             {
                 if (reward == null)
                     return null;
 
-                var parameters = reward.GetParams();
+                var parameters = reward.Parameters;
                 return new RewardStatModel
                 {
                     Amount = decimal.Parse(parameters[RewardBase.AmountParam]),

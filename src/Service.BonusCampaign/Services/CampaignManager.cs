@@ -9,6 +9,7 @@ using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
+using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;

@@ -25,11 +25,13 @@ namespace Service.BonusCampaign.Domain.Helpers
 
         public async Task<List<Campaign>> GetCampaignsWithoutThisClient(string clientId)
         {
-            var entities = await _campaignWriter.GetAsync();
-            return entities
-                .Select(entity=>entity.Campaign)
-                .Where(campaign=>campaign.CampaignClientContexts.All(context => context.ClientId != clientId))
-                .ToList();
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            return await ctx.Campaigns.Where(campaign =>
+                    campaign.Status == CampaignStatus.Active &&
+                    campaign.CampaignClientContexts.All(context => context.ClientId != clientId))
+                .Include(t=>t.CriteriaList)
+                .Include(t=>t.Conditions)
+                .ToListAsync();
         }
 
         public async Task<List<Campaign>> GetCampaigns()
