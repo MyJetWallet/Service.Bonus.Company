@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.BonusCampaign.Domain;
+using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Criteria;
@@ -22,11 +23,13 @@ namespace Service.BonusCampaign.Services
     {
         private readonly ILogger<CampaignManager> _logger;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
+        private readonly CampaignRepository _campaignRepository;
 
-        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignRepository campaignRepository)
         {
             _logger = logger;
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            _campaignRepository = campaignRepository;
         }
 
         public async Task<OperationResponse> CreateOrUpdateCampaign(CampaignGrpcModel request)
@@ -69,7 +72,10 @@ namespace Service.BonusCampaign.Services
                 await context.UpsertAsync(campaign.Conditions);
                 await context.UpsertAsync(campaign.Conditions.SelectMany(t=>t.Rewards));
 
-
+                if (campaign.Status == CampaignStatus.Active)
+                {
+                    await _campaignRepository.SetActiveCampaigns(new() { campaign });
+                }
                 return new OperationResponse() { IsSuccess = true };
             }
             catch (Exception e)

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.DynamicLinkGenerator.Models;
+using MyJetWallet.DynamicLinkGenerator.Services;
 using MyNoSqlServer.Abstractions;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
@@ -24,12 +26,14 @@ namespace Service.BonusCampaign.Client
         private readonly IClientContextService _contextClient;
         private readonly IMyNoSqlServerDataReader<CampaignNoSqlEntity> _campaignReader;
         private readonly ITemplateClient _templateClient;
+        private readonly IDynamicLinkClient _dynamicLinkClient;
 
-        public CampaignStatClient(IClientContextService contextClient, ITemplateClient templateClient, IMyNoSqlServerDataReader<CampaignNoSqlEntity> campaignReader)
+        public CampaignStatClient(IClientContextService contextClient, ITemplateClient templateClient, IMyNoSqlServerDataReader<CampaignNoSqlEntity> campaignReader, IDynamicLinkClient dynamicLinkClient)
         {
             _contextClient = contextClient;
             _templateClient = templateClient;
             _campaignReader = campaignReader;
+            _dynamicLinkClient = dynamicLinkClient;
         }
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
@@ -70,7 +74,11 @@ namespace Service.BonusCampaign.Client
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = "https://jetwallet.page.link/?link=https%3a%2f%2fgoogle.com%3fcode%3d777%26jw_command%3dInviteFriend%26&apn=com.example.flutter_jetwallet&ibi=newapp.trading",
+                    DeepLink = _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
+                    {
+                        Brand = request.Brand,
+                        DeviceType = DeviceTypeEnum.Unknown
+                    }),
                 };
 
                 stats.Add(stat);

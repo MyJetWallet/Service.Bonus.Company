@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using MyJetWallet.DynamicLinkGenerator.Services;
 using MyJetWallet.Sdk.Grpc;
 using MyNoSqlServer.DataReader;
 using Service.BonusCampaign.Domain.Models.NoSql;
@@ -13,12 +14,14 @@ namespace Service.BonusCampaign.Client
         private readonly MyNoSqlReadRepository<CampaignClientContextNoSqlEntity> _contextReader;
         private readonly MyNoSqlReadRepository<CampaignNoSqlEntity> _campaignsReader;
         private readonly ITemplateClient _templateClient;
+        private readonly IDynamicLinkClient _dynamicLinkClient;
 
-        public BonusCampaignClientFactory(string grpcServiceUrl, MyNoSqlReadRepository<CampaignClientContextNoSqlEntity> contextReader, MyNoSqlReadRepository<CampaignNoSqlEntity> campaignsReader, ITemplateClient templateClient) : base(grpcServiceUrl)
+        public BonusCampaignClientFactory(string grpcServiceUrl, MyNoSqlReadRepository<CampaignClientContextNoSqlEntity> contextReader, MyNoSqlReadRepository<CampaignNoSqlEntity> campaignsReader, ITemplateClient templateClient, IDynamicLinkClient dynamicLinkClient) : base(grpcServiceUrl)
         {
             _contextReader = contextReader;
             _campaignsReader = campaignsReader;
             _templateClient = templateClient;
+            _dynamicLinkClient = dynamicLinkClient;
         }
 
         public ICampaignManager GetCampaignManager() => CreateGrpcService<ICampaignManager>();
@@ -27,8 +30,8 @@ namespace Service.BonusCampaign.Client
             ? new ClientContextClient(_contextReader, CreateGrpcService<IClientContextService>())
             : CreateGrpcService<IClientContextService>();
         
-        public ICampaignStatService GetCampaignStatService() => (_contextReader != null && _templateClient != null)
-            ? new CampaignStatClient(GetClientContextService(), _templateClient, _campaignsReader)
+        public ICampaignStatService GetCampaignStatService() => (_contextReader != null && _templateClient != null && _dynamicLinkClient != null)
+            ? new CampaignStatClient(GetClientContextService(), _templateClient, _campaignsReader, _dynamicLinkClient)
             :CreateGrpcService<ICampaignStatService>();
 
 

@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.DynamicLinkGenerator.Models;
+using MyJetWallet.DynamicLinkGenerator.Services;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
@@ -25,12 +27,14 @@ namespace Service.BonusCampaign.Services
         private readonly CampaignClientContextRepository _contextRepository;
         private readonly CampaignRepository _campaignRepository;
         private readonly ITemplateClient _templateClient;
-        public CampaignStatService(CampaignClientContextRepository contextRepository, ILogger<CampaignStatService> logger, CampaignRepository campaignRepository, ITemplateClient templateClient)
+        private readonly IDynamicLinkClient _dynamicLinkClient;
+        public CampaignStatService(CampaignClientContextRepository contextRepository, ILogger<CampaignStatService> logger, CampaignRepository campaignRepository, ITemplateClient templateClient, IDynamicLinkClient dynamicLinkClient)
         {
             _contextRepository = contextRepository;
             _logger = logger;
             _campaignRepository = campaignRepository;
             _templateClient = templateClient;
+            _dynamicLinkClient = dynamicLinkClient;
         }
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
@@ -71,7 +75,11 @@ namespace Service.BonusCampaign.Services
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = "https://jetwallet.page.link/?link=https%3a%2f%2fgoogle.com%3fcode%3d777%26jw_command%3dInviteFriend%26&apn=com.example.flutter_jetwallet&ibi=newapp.trading",
+                    DeepLink = _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
+                    {
+                        Brand = request.Brand,
+                        DeviceType = DeviceTypeEnum.Unknown
+                    }),
                 };
 
                 stats.Add(stat);

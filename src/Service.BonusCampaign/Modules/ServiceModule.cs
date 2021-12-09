@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Autofac.Core.Registration;
+using MyJetWallet.DynamicLinkGenerator.Ioc;
 using MyJetWallet.Sdk.NoSql;
 using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
@@ -29,6 +30,8 @@ namespace Service.BonusCampaign.Modules
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
+            
+            builder.RegisterDynamicLinkClient(noSqlClient);
             
         }
     }
