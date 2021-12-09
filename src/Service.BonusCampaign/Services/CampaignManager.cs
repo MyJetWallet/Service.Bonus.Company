@@ -62,7 +62,8 @@ namespace Service.BonusCampaign.Services
                     Status = request.Status,
                     ImageUrl = request.ImageUrl,
                     CriteriaList = criteriaList,
-                    Conditions = conditions
+                    Conditions = conditions,
+                    DynamicLink = request.DynamicLink
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);

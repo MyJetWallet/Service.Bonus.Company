@@ -21,5 +21,6 @@ namespace Service.BonusCampaign.Domain.Models
         public List<AccessCriteriaBase> CriteriaList { get; set; }
         public List<ConditionBase> Conditions { get; set; }
         public List<CampaignClientContext> CampaignClientContexts { get; set; }
+        public string DynamicLink { get; set; }
     }
 }
