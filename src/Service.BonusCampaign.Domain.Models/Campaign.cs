@@ -4,7 +4,7 @@ using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
-using Service.BonusClientContext.Domain.Models;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models
 {
@@ -21,6 +21,7 @@ namespace Service.BonusCampaign.Domain.Models
         public List<AccessCriteriaBase> CriteriaList { get; set; }
         public List<ConditionBase> Conditions { get; set; }
         public List<CampaignClientContext> CampaignClientContexts { get; set; }
-        public string DynamicLink { get; set; }
+        public ActionEnum Action { get; set; }
+        public string SerializedRequest { get; set; }
     }
 }

@@ -17,6 +17,7 @@ using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusCampaign.Domain.Models.Stats;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 using Service.MessageTemplates.Client;
 
 namespace Service.BonusCampaign.Client
@@ -74,11 +75,7 @@ namespace Service.BonusCampaign.Client
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
-                    {
-                        Brand = request.Brand,
-                        DeviceType = DeviceTypeEnum.Unknown
-                    }),
+                    DeepLink = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand)
                 };
 
                 stats.Add(stat);
@@ -169,7 +166,39 @@ namespace Service.BonusCampaign.Client
                     && t.Type != ConditionType.ConditionsCondition).ToList();
                     
                 return notMetStates.Any() ? notMetStates.Min(t=>t.ExpirationTime) : DateTime.MinValue;
-            }        
+            }
+
+            string GenerateDeepLink(ActionEnum action, string serializedRequest, string brand)
+            {
+                switch (action)
+                {
+                    case ActionEnum.None:
+                        return String.Empty;
+                    case ActionEnum.Login:
+                        return _dynamicLinkClient.GenerateLoginLink(new GenerateLoginLinkRequest()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });
+                    case ActionEnum.ConfirmEmail:
+                        if(string.IsNullOrWhiteSpace(serializedRequest))
+                            return String.Empty;
+                        var linkRequest = JsonSerializer.Deserialize<GenerateConfirmEmailLinkRequest>(serializedRequest);
+                        if (linkRequest == null) 
+                            return String.Empty;
+                        linkRequest.Brand = brand;
+                        linkRequest.DeviceType = DeviceTypeEnum.Unknown;
+                        return _dynamicLinkClient.GenerateConfirmEmailLink(linkRequest);
+                    case ActionEnum.InviteFriend:
+                        return _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });;
+                    default:
+                        return String.Empty;
+                }
+            }
         }
     }
 }

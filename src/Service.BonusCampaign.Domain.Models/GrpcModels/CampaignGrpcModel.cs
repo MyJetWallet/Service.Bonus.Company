@@ -7,6 +7,7 @@ using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models.GrpcModels
 {
@@ -24,8 +25,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 9)] public List<ConditionGrpcModel> Conditions { get; set; }
         [DataMember(Order = 10)] public List<CampaignClientContextGrpcModel> Contexts { get; set; }
         [DataMember(Order = 11)] public string DescriptionTemplateId { get; set; }
-        [DataMember(Order = 12)] public string DynamicLink { get; set; }
-
+        [DataMember(Order = 12)] public string SerializedRequest { get; set; }
+        [DataMember(Order = 13)] public ActionEnum Action { get; set; }
     }
 
     [DataContract]
@@ -157,7 +158,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 CriteriaList = campaign.CriteriaList?.Select(ToGrpcModel).ToList() ?? new (),
                 Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new (),
                 Contexts = campaign.CampaignClientContexts?.Select(ToGrpcModel).ToList() ?? new (),
-                DynamicLink = campaign.DynamicLink
+                SerializedRequest = campaign.SerializedRequest,
+                Action = campaign.Action
             };
         }
         
