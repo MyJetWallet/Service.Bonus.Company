@@ -21,23 +21,31 @@ namespace Service.BonusCampaign.Services
         public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = await ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId)
-                .Include(t => t.Conditions).ToListAsync();
+            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId);
+
+            if (request.Take != 0)
+               contexts = contexts.Take(request.Take);
+
+            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
             return new GetContextsByClientResponse()
             {
-                Contexts = contexts.Select(t => t.ToGrpcModel()).ToList()
+                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
             };
         }
 
         public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = await ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId && !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked))
-                .Include(t => t.Conditions).ToListAsync();
+            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId && !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked));
+
+            if (request.Take != 0)
+                contexts = contexts.Take(request.Take);
+
+            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
             return new GetContextsByClientResponse()
             {
-                Contexts = contexts.Select(t => t.ToGrpcModel()).ToList()
-            };        
+                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
+            };
         }
     }
 }

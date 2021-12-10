@@ -28,7 +28,9 @@ namespace Service.BonusCampaign.Client
             {
                 return new GetContextsByClientResponse
                 {
-                    Contexts = entity.Select(t => t.Context.ToGrpcModel()).ToList()
+                    Contexts = request.Take != 0 
+                        ? entity.Skip(request.Skip).Take(request.Take).Select(t => t.Context.ToGrpcModel()).ToList()
+                        : entity.Skip(request.Skip).Select(t => t.Context.ToGrpcModel()).ToList()
                 };
             }
 
@@ -39,12 +41,14 @@ namespace Service.BonusCampaign.Client
         {
             var entity = _reader.Get(CampaignClientContextNoSqlEntity.GeneratePartitionKey(request.ClientId));
             if (entity != null && entity.Any())
-            {
-                var contexts = entity.Select(t => t.Context.ToGrpcModel())
-                    .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList();
+            { 
                 return new GetContextsByClientResponse
                 {
-                    Contexts = contexts
+                    Contexts = request.Take != 0 
+                        ? entity.Skip(request.Skip).Take(request.Take).Select(t => t.Context.ToGrpcModel())
+                            .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList()
+                        : entity.Skip(request.Skip).Select(t => t.Context.ToGrpcModel())
+                            .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList()
                 };
             }
 
