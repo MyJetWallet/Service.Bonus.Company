@@ -4,6 +4,7 @@ namespace Service.BonusCampaign.Domain.Models.Enums
     {
         NotMet,
         Met,
-        Expired
+        Expired,
+        Blocked
     }
 }

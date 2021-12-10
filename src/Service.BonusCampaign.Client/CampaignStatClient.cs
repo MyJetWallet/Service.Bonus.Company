@@ -39,7 +39,7 @@ namespace Service.BonusCampaign.Client
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
         {
             var campaigns = _campaignReader.Get().Select(t=>t.Campaign).Where(campaign=>campaign.Contexts.Any(context=>context.ClientId == request.ClientId)).ToList();
-            var contextResponse = await _contextClient.GetContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
+            var contextResponse = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
 
             var ids = campaigns.Select(t => t.Id).ToList();
             var contexts = contextResponse.Contexts.Where(t => ids.Contains(t.CampaignId)).ToList();

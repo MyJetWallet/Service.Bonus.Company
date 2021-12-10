@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
@@ -26,6 +27,17 @@ namespace Service.BonusCampaign.Services
             {
                 Contexts = contexts.Select(t => t.ToGrpcModel()).ToList()
             };
+        }
+
+        public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            var contexts = await ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId && t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked))
+                .Include(t => t.Conditions).ToListAsync();
+            return new GetContextsByClientResponse()
+            {
+                Contexts = contexts.Select(t => t.ToGrpcModel()).ToList()
+            };        
         }
     }
 }

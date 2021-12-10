@@ -60,7 +60,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(campaigns);
         }
-        
+
         public async Task SetFinishedCampaigns(List<Campaign> campaigns)
         {
             foreach (var campaign in campaigns)

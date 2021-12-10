@@ -29,7 +29,7 @@ namespace Service.BonusCampaign.Worker.Jobs
         private async Task DoProcess()
         {
             var campaigns = await _campaignRepository.GetCampaigns();
-            var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
+            var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled && t.Status != CampaignStatus.Active).ToList();
             foreach (var campaign in activeCampaigns)
             {
                 campaign.Status = CampaignStatus.Active;
@@ -46,7 +46,13 @@ namespace Service.BonusCampaign.Worker.Jobs
             _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }
 
-        public void Start() => _timer.Start();
+        public void Start()
+        {
+            var campaigns = _campaignRepository.GetCampaigns().GetAwaiter().GetResult();
+            var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
+            _campaignRepository.SetActiveCampaigns(activeCampaigns).GetAwaiter().GetResult();
+            _timer.Start();
+        }
 
         public void Dispose() => _timer?.Dispose();
     }
