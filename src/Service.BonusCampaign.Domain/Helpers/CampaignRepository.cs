@@ -71,5 +71,19 @@ namespace Service.BonusCampaign.Domain.Helpers
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(campaigns);
         }
+        
+        public async Task RefreshCampaign(string campaignId)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            var campaign = await ctx.Campaigns
+                .Include(t=>t.CriteriaList)
+                .Include(t=>t.Conditions)
+                .ThenInclude(t=>t.Rewards)
+                .Include(t=>t.CampaignClientContexts)
+                .ThenInclude(t=>t.Conditions)
+                .FirstOrDefaultAsync(t=>t.Id == campaignId);
+
+            await _campaignWriter.InsertOrReplaceAsync(CampaignNoSqlEntity.Create(campaign));
+        }
     }
 }

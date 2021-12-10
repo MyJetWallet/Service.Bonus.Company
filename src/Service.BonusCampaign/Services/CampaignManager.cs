@@ -76,7 +76,7 @@ namespace Service.BonusCampaign.Services
 
                 if (campaign.Status == CampaignStatus.Active)
                 {
-                    await _campaignRepository.SetActiveCampaigns(new() { campaign });
+                    await _campaignRepository.RefreshCampaign(campaignId);
                 }
                 return new OperationResponse() { IsSuccess = true };
             }
@@ -130,5 +130,6 @@ namespace Service.BonusCampaign.Services
                 Contexts = contexts
             };
         }
+        
     }
 }
