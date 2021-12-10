@@ -19,5 +19,11 @@ namespace Service.BonusCampaign.Grpc
 
         [OperationContract]
         Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request);
+        
+        [OperationContract]
+        Task<OperationResponse> BlockUserInCampaign(BlockUserRequest request);
+        
+        [OperationContract]
+        Task<OperationResponse> UnblockUserInCampaign(BlockUserRequest request);
     }
 }

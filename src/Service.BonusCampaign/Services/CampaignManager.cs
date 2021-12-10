@@ -24,12 +24,14 @@ namespace Service.BonusCampaign.Services
         private readonly ILogger<CampaignManager> _logger;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignRepository _campaignRepository;
+        private readonly CampaignClientContextRepository _contextRepository;
 
-        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignRepository campaignRepository)
+        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignRepository campaignRepository, CampaignClientContextRepository contextRepository)
         {
             _logger = logger;
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _campaignRepository = campaignRepository;
+            _contextRepository = contextRepository;
         }
 
         public async Task<OperationResponse> CreateOrUpdateCampaign(CampaignGrpcModel request)
@@ -64,7 +66,9 @@ namespace Service.BonusCampaign.Services
                     CriteriaList = criteriaList,
                     Conditions = conditions,
                     SerializedRequest = request.SerializedRequest,
-                    Action = request.Action
+                    Action = request.Action,
+                    Name = request.Name,
+                    Weight = request.Weight
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
@@ -130,6 +134,69 @@ namespace Service.BonusCampaign.Services
                 Contexts = contexts
             };
         }
-        
+
+        public async Task<OperationResponse> BlockUserInCampaign(BlockUserRequest request)
+        {
+            _logger.LogInformation("Blocking client {clientId} at campaign {campaignId}", request.ClientId, request.CampaignId);
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var contexts = await ctx.CampaignClientContexts
+                    .Where(t => t.ClientId == request.ClientId && t.CampaignId == request.CampaignId).ToListAsync();
+
+                if (contexts.Any())
+                {
+                    foreach (var condition in contexts.SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.NotMet)))
+                    {
+                        condition.Status = ConditionStatus.Blocked;
+                    }
+                }
+                
+                await _contextRepository.UpsertContext(contexts);
+
+                return new OperationResponse() { IsSuccess = true };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When blocking client {clientId}", request.ClientId);
+                return new OperationResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
+        public async Task<OperationResponse> UnblockUserInCampaign(BlockUserRequest request)
+        {
+            _logger.LogInformation("Unblocking client {clientId} at campaign {campaignId}", request.ClientId, request.CampaignId);
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var contexts = await ctx.CampaignClientContexts
+                    .Where(t => t.ClientId == request.ClientId && t.CampaignId == request.CampaignId).ToListAsync();
+
+                if (contexts.Any())
+                {
+                    foreach (var condition in contexts.SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.Blocked)))
+                    {
+                        condition.Status = ConditionStatus.NotMet;
+                    }
+                }
+                
+                await _contextRepository.UpsertContext(contexts);
+
+                return new OperationResponse() { IsSuccess = true };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When unblocking client {clientId}", request.ClientId);
+                return new OperationResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
     }
 }

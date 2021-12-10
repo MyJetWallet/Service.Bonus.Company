@@ -23,5 +23,7 @@ namespace Service.BonusCampaign.Domain.Models
         public List<CampaignClientContext> CampaignClientContexts { get; set; }
         public ActionEnum Action { get; set; }
         public string SerializedRequest { get; set; }
+        public string Name { get; set; }
+        public int Weight { get; set; }
     }
 }
