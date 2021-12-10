@@ -41,7 +41,7 @@ namespace Service.BonusCampaign.Client
             if (entity != null)
             {
                 var contexts = entity.Select(t => t.Context.ToGrpcModel())
-                    .Where(t => t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList();
+                    .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList();
                 return new GetContextsByClientResponse
                 {
                     Contexts = contexts
