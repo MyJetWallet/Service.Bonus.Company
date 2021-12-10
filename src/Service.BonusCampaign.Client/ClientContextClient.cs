@@ -24,7 +24,7 @@ namespace Service.BonusCampaign.Client
         public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
         {
             var entity = _reader.Get(CampaignClientContextNoSqlEntity.GeneratePartitionKey(request.ClientId));
-            if (entity != null)
+            if (entity != null && entity.Any())
             {
                 return new GetContextsByClientResponse
                 {
@@ -38,7 +38,7 @@ namespace Service.BonusCampaign.Client
         public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
             var entity = _reader.Get(CampaignClientContextNoSqlEntity.GeneratePartitionKey(request.ClientId));
-            if (entity != null)
+            if (entity != null && entity.Any())
             {
                 var contexts = entity.Select(t => t.Context.ToGrpcModel())
                     .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked)).ToList();
