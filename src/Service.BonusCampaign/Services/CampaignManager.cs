@@ -180,7 +180,7 @@ namespace Service.BonusCampaign.Services
 
                 if (contexts.Any())
                 {
-                    foreach (var condition in contexts.Where(context=>context.Conditions.Any()).SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.NotMet)))
+                    foreach (var condition in contexts.Where(context=>context.Conditions.Any()).SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.Blocked)))
                     {
                         condition.Status = ConditionStatus.NotMet;
                     }
