@@ -142,11 +142,12 @@ namespace Service.BonusCampaign.Services
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 var contexts = await ctx.CampaignClientContexts
+                    .Include(t=>t.Conditions)
                     .Where(t => t.ClientId == request.ClientId && t.CampaignId == request.CampaignId).ToListAsync();
 
                 if (contexts.Any())
                 {
-                    foreach (var condition in contexts.SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.NotMet)))
+                    foreach (var condition in contexts.Where(context=>context.Conditions.Any()).SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.NotMet)))
                     {
                         condition.Status = ConditionStatus.Blocked;
                     }
@@ -174,11 +175,12 @@ namespace Service.BonusCampaign.Services
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 var contexts = await ctx.CampaignClientContexts
+                    .Include(t=>t.Conditions)
                     .Where(t => t.ClientId == request.ClientId && t.CampaignId == request.CampaignId).ToListAsync();
 
                 if (contexts.Any())
                 {
-                    foreach (var condition in contexts.SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.Blocked)))
+                    foreach (var condition in contexts.Where(context=>context.Conditions.Any()).SelectMany(context => context.Conditions.Where(condition => condition.Status == ConditionStatus.NotMet)))
                     {
                         condition.Status = ConditionStatus.NotMet;
                     }
