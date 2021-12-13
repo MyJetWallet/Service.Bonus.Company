@@ -77,10 +77,12 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<AccessCriteriaBase>().Property(e => e.Parameters).HasColumnType("jsonb");
             modelBuilder.Entity<AccessCriteriaBase>().HasDiscriminator(e => e.CriteriaType)
                 .HasValue<KycCriteria>(CriteriaType.KycType)
-                .HasValue<ReferralCriteria>(CriteriaType.ReferralType);
+                .HasValue<ReferralCriteria>(CriteriaType.ReferralType)
+                .HasValue<RegistrationCriteria>(CriteriaType.RegistrationType);
             
             modelBuilder.Entity<KycCriteria>().HasBaseType<AccessCriteriaBase>();
             modelBuilder.Entity<ReferralCriteria>().HasBaseType<AccessCriteriaBase>();
+            modelBuilder.Entity<RegistrationCriteria>().HasBaseType<AccessCriteriaBase>();
 
             modelBuilder.Entity<AccessCriteriaBase>().HasOne<Campaign>().WithMany(t => t.CriteriaList).HasForeignKey(t=>t.CampaignId);
             

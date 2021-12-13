@@ -8,15 +8,16 @@ namespace Service.BonusCampaign.Domain
 {
     public class AccessCriteriaFactory
     {
-        public static AccessCriteriaBase CreateCriteria(CriteriaType type, Dictionary<string, string> parameters, string criteriaID, string campaignId)
+        public static AccessCriteriaBase CreateCriteria(CriteriaType type, Dictionary<string, string> parameters, string criteriaId, string campaignId)
         {
             switch (type)
             {
                 case CriteriaType.KycType:
-                    return new KycCriteria(parameters, criteriaID, campaignId);
+                    return new KycCriteria(parameters, criteriaId, campaignId);
                 case CriteriaType.ReferralType:
-                    return new ReferralCriteria(parameters, criteriaID, campaignId);
+                    return new ReferralCriteria(parameters, criteriaId, campaignId);
                 case CriteriaType.RegistrationType:
+                    return new RegistrationCriteria(parameters, criteriaId, campaignId);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -24,15 +25,13 @@ namespace Service.BonusCampaign.Domain
         
         public static Dictionary<string, string> GetParams(CriteriaType type)
         {
-            switch (type)
+            return type switch
             {
-                case CriteriaType.KycType:
-                    return KycCriteria.ParamDictionary;
-                case CriteriaType.ReferralType:
-                    return ReferralCriteria.ParamDictionary;
-                default:
-                    return new Dictionary<string, string>();
-            }
+                CriteriaType.KycType => KycCriteria.ParamDictionary,
+                CriteriaType.ReferralType => ReferralCriteria.ParamDictionary,
+                CriteriaType.RegistrationType => RegistrationCriteria.ParamDictionary,
+                _ => new Dictionary<string, string>()
+            };
         }
     }
 }

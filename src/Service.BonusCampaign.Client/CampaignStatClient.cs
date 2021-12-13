@@ -75,7 +75,8 @@ namespace Service.BonusCampaign.Client
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand)
+                    DeepLink = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand),
+                    Weight = campaign.Weight
                 };
 
                 stats.Add(stat);
@@ -83,11 +84,11 @@ namespace Service.BonusCampaign.Client
 
             return new CampaignStatsResponse
             {
-                Campaigns = stats
+                Campaigns = stats.OrderByDescending(model=>model.Weight).ToList()
             };
 
             //locals 
-            ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewards)
+            ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewardsList)
             {
                 switch (state.Type)
                 {
@@ -97,7 +98,7 @@ namespace Service.BonusCampaign.Client
                             Type = ConditionType.KYCCondition,
                             Params = new Dictionary<string, string>()
                                 { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  } },
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     case ConditionType.TradeCondition:
                     {
@@ -130,7 +131,7 @@ namespace Service.BonusCampaign.Client
                                 { "TradedAmount", paramsModel.TradeAmount.ToString() },
                                 { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }
                             },
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     }
                     case ConditionType.DepositCondition:
@@ -139,7 +140,7 @@ namespace Service.BonusCampaign.Client
                             Type = ConditionType.DepositCondition,
                             Params = new Dictionary<string, string>()
                                 { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower() } },
-                            Reward = GetRewardStat(rewards.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
                         };
                     default:
                         return null;

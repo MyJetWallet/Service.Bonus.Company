@@ -29,6 +29,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 13)] public ActionEnum Action { get; set; }
         [DataMember(Order = 14)] public string Name { get; set; }
         [DataMember(Order = 15)] public int Weight { get; set; }
+        [DataMember(Order = 16)] public bool ShowReferrerStats { get; set; }
     }
 
     [DataContract]
@@ -163,7 +164,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 SerializedRequest = campaign.SerializedRequest,
                 Action = campaign.Action,
                 Name = campaign.Name,
-                Weight = campaign.Weight
+                Weight = campaign.Weight,
+                ShowReferrerStats = campaign.ShowReferrerStats
             };
         }
         

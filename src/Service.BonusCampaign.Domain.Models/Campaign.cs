@@ -25,5 +25,6 @@ namespace Service.BonusCampaign.Domain.Models
         public string SerializedRequest { get; set; }
         public string Name { get; set; }
         public int Weight { get; set; }
+        public bool ShowReferrerStats { get; set; }
     }
 }

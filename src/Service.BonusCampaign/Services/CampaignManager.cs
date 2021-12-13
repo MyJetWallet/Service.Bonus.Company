@@ -68,7 +68,8 @@ namespace Service.BonusCampaign.Services
                     SerializedRequest = request.SerializedRequest,
                     Action = request.Action,
                     Name = request.Name,
-                    Weight = request.Weight
+                    Weight = request.Weight,
+                    ShowReferrerStats = request.ShowReferrerStats
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
