@@ -29,7 +29,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override Task<bool> Check(ClientContext context)
         {
             Init();
-            if (!_countries.Any())
+            if (_countries.All(string.IsNullOrWhiteSpace))
                 return Task.FromResult(true);
             
             if(string.IsNullOrEmpty(context.Country))
