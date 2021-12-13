@@ -13,7 +13,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class KycCondition : ConditionBase
     {
-        private const string KycParam = "KYCPassed";
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.KYCCondition;
@@ -60,9 +59,6 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 
         public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);
 
-        public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
-        {
-            { KycParam, typeof(bool).ToString() },
-        };
+        public static readonly Dictionary<string, string> ParamDictionary = new ();
     }
 }
