@@ -65,6 +65,11 @@ namespace Service.BonusCampaign.Services
                     .Select(condition => GetConditionStat(condition, rewards))
                     .ToList();
 
+                var deepLink = _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
+                {
+                    Brand = request.Brand,
+                    DeviceType = DeviceTypeEnum.Unknown
+                });
                 var stat = new CampaignStatModel
                 {
                     Title =
@@ -75,11 +80,8 @@ namespace Service.BonusCampaign.Services
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
-                    {
-                        Brand = request.Brand,
-                        DeviceType = DeviceTypeEnum.Unknown
-                    }),
+                    DeepLink = deepLink.shortLink,
+                    DeepLinkWeb = deepLink.longLink
                 };
 
                 stats.Add(stat);

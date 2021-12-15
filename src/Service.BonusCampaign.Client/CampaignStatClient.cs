@@ -65,6 +65,7 @@ namespace Service.BonusCampaign.Client
                     .Select(condition => GetConditionStat(condition, rewards))
                     .ToList();
 
+                var (longLink, shortLink) = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand);
                 var stat = new CampaignStatModel
                 {
                     Title =
@@ -75,8 +76,9 @@ namespace Service.BonusCampaign.Client
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
                     CampaignId = campaign.Id,
-                    DeepLink = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand),
-                    Weight = campaign.Weight
+                    DeepLink = shortLink,
+                    Weight = campaign.Weight,
+                    DeepLinkWeb = longLink
                 };
 
                 stats.Add(stat);
@@ -169,12 +171,12 @@ namespace Service.BonusCampaign.Client
                 return notMetStates.Any() ? notMetStates.Min(t=>t.ExpirationTime) : DateTime.MinValue;
             }
 
-            string GenerateDeepLink(ActionEnum action, string serializedRequest, string brand)
+            (string longLink, string shortLink) GenerateDeepLink(ActionEnum action, string serializedRequest, string brand)
             {
                 switch (action)
                 {
                     case ActionEnum.None:
-                        return String.Empty;
+                        return (String.Empty, String.Empty);
                     case ActionEnum.Login:
                         return _dynamicLinkClient.GenerateLoginLink(new GenerateLoginLinkRequest()
                         {
@@ -183,10 +185,10 @@ namespace Service.BonusCampaign.Client
                         });
                     case ActionEnum.ConfirmEmail:
                         if(string.IsNullOrWhiteSpace(serializedRequest))
-                            return String.Empty;
+                            return (String.Empty, String.Empty);
                         var linkRequest = JsonSerializer.Deserialize<GenerateConfirmEmailLinkRequest>(serializedRequest);
                         if (linkRequest == null) 
-                            return String.Empty;
+                            return (String.Empty, String.Empty);
                         linkRequest.Brand = brand;
                         linkRequest.DeviceType = DeviceTypeEnum.Unknown;
                         return _dynamicLinkClient.GenerateConfirmEmailLink(linkRequest);
@@ -197,7 +199,7 @@ namespace Service.BonusCampaign.Client
                             DeviceType = DeviceTypeEnum.Unknown
                         });;
                     default:
-                        return String.Empty;
+                        return (String.Empty, String.Empty);
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace TestApp
     {
         static async Task Main(string[] args)
         {
+            var clientId = "7c8fd6b8087d40998a3a46e3dc06263c";
             GrpcClientFactory.AllowUnencryptedHttp2 = true;
             var myNoSqlClient = new MyNoSqlTcpClient(() => "192.168.70.80:5125", "BonusCampaignTestApp");
             
@@ -46,18 +48,20 @@ namespace TestApp
 
             while (true)
             {
+                var campaigns = campaignSubs.Get().Select(t=>t.Campaign).ToList();
                 var contexts = await contextService.GetContextsByClient(new GetContextsByClientRequest
                 {
-                    ClientId = "458c159cb86f45b2bf760014d2caf82d"
+                    ClientId = clientId
                 });
                 var campaignsStats = await stats.GetCampaignsStats(new CampaignStatRequest
                 {
-                    ClientId = "458c159cb86f45b2bf760014d2caf82d",
+                    ClientId = clientId,
                     Brand = "simple",
                     Lang = "En",
                 });
 
-                Console.WriteLine(JsonSerializer.Serialize(contexts));
+                //Console.WriteLine(JsonSerializer.Serialize(campaigns));
+                //Console.WriteLine(JsonSerializer.Serialize(contexts));
                 Console.WriteLine(JsonSerializer.Serialize(campaignsStats));
 
                 Console.WriteLine("End");
