@@ -78,7 +78,8 @@ namespace Service.BonusCampaign.Client
                     CampaignId = campaign.Id,
                     DeepLink = shortLink,
                     Weight = campaign.Weight,
-                    DeepLinkWeb = longLink
+                    DeepLinkWeb = longLink,
+                    ShowReferrerStats = campaign.ShowReferrerStats
                 };
 
                 stats.Add(stat);
