@@ -8,8 +8,8 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 {
     public class ReferralCriteria : AccessCriteriaBase
     {
-        private const string ReferralParam = "HasReferral";
-        private bool _hasReferral;
+        private const string ReferrerParam = "HasReferrer";
+        private bool _hasReferrer;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
@@ -28,19 +28,19 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override Task<bool> Check(ClientContext context)
         {
             Init();
-            return Task.FromResult(string.IsNullOrWhiteSpace(context.ReferrerClientId) != _hasReferral);
+            return Task.FromResult(string.IsNullOrWhiteSpace(context.ReferrerClientId) != _hasReferrer);
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
         
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
-            { ReferralParam, typeof(bool).ToString() },
+            { ReferrerParam, typeof(bool).ToString() },
         };
 
         private void Init()
         {
-            if (!Parameters.TryGetValue(ReferralParam, out var hasReferral) || !bool.TryParse(hasReferral.ToLower(), out _hasReferral))
+            if (!Parameters.TryGetValue(ReferrerParam, out var hasReferral) || !bool.TryParse(hasReferral.ToLower(), out _hasReferrer))
             {
                 throw new Exception("Invalid arguments");
             }

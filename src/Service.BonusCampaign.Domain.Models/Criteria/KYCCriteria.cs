@@ -8,14 +8,19 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 {
     public class KycCriteria : AccessCriteriaBase
     {
-        private const string KycParam = "KYCPassed";
-        private bool _kycStatus;
+        private const string KycDepositParam = "KycDepositAllowed";
+        private const string KycTradeParam = "KycTradeAllowed";
+        private const string KycWithdrawalParam = "KycWithdrawalAllowed";
+        private bool _kycDepositStatus;
+        private bool _kycTradeStatus;
+        private bool _kycWithdrawalStatus;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
         public override Dictionary<string, string> Parameters { get; set; }
 
-        public KycCriteria(Dictionary<string, string> parameters, string criteriaId, string campaignId) : base(parameters)
+        public KycCriteria(Dictionary<string, string> parameters, string criteriaId, string campaignId) : base(
+            parameters)
         {
             CriteriaId = criteriaId ?? Guid.NewGuid().ToString("N");
             CampaignId = campaignId;
@@ -28,22 +33,32 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override Task<bool> Check(ClientContext context)
         {
             Init();
-            return Task.FromResult(context.KYCDone == _kycStatus);
+            return Task.FromResult(context.KycDepositAllowed == _kycDepositStatus &&
+                                   context.KycTradeAllowed == _kycTradeStatus &&
+                                   context.KycWithdrawalAllowed == _kycWithdrawalStatus);
         }
 
-        public override Dictionary<string, string> GetParams() => Parameters;
-        
-        public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
+        public override Dictionary<string, string> GetParams()
         {
-            { KycParam, typeof(bool).ToString() },
+            return Parameters;
+        }
+
+        public static readonly Dictionary<string, string> ParamDictionary = new()
+        {
+            { KycDepositParam, typeof(bool).ToString() },
+            { KycTradeParam, typeof(bool).ToString() },
+            { KycWithdrawalParam, typeof(bool).ToString() }
         };
-        
+
         private void Init()
         {
-            if (!Parameters.TryGetValue(KycParam, out var kycStatus) && !bool.TryParse(kycStatus, out _kycStatus))
-            {
+            if (!Parameters.TryGetValue(KycDepositParam, out var deposit)
+                && !Parameters.TryGetValue(KycTradeParam, out var trade)
+                && !Parameters.TryGetValue(KycWithdrawalParam, out var withdrawal)
+                && !bool.TryParse(deposit, out _kycDepositStatus)
+                && !bool.TryParse(trade, out _kycTradeStatus)
+                && !bool.TryParse(withdrawal, out _kycWithdrawalStatus))
                 throw new Exception("Invalid arguments");
-            }
         }
     }
 }

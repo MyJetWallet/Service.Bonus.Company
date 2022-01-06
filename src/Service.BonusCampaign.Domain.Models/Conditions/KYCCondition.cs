@@ -13,6 +13,13 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class KycCondition : ConditionBase
     {
+        private const string KycDepositParam = "KycDepositAllowed";
+        private const string KycTradeParam = "KycTradeAllowed";
+        private const string KycWithdrawalParam = "KycWithdrawalAllowed";
+        private bool _kycDepositStatus;
+        private bool _kycTradeStatus;
+        private bool _kycWithdrawalStatus;
+        
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.KYCCondition;
@@ -35,6 +42,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
+            
+            Init();
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -44,19 +53,40 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             if (IsExpired(campaignContext.ActivationTime))
                 return ConditionStatus.Expired;
+
+            Init();
+
+            if (context.KycEvent == null) 
+                return ConditionStatus.NotMet;
             
-            if (context.KycEvent != null && context.KycEvent.KycPassed)
+            if(_kycDepositStatus && !context.KycEvent.KycDepositPassed)
+                return ConditionStatus.NotMet;
+
+            if(_kycTradeStatus && !context.KycEvent.KycTradePassed)
+                return ConditionStatus.NotMet;
+            
+            if(_kycWithdrawalStatus && !context.KycEvent.KycWithdrawalPassed)
+                return ConditionStatus.NotMet;
+                
+            foreach (var reward in Rewards)
             {
-                foreach (var reward in Rewards)
-                {
-                    await reward.ExecuteReward(context, publisher);
-                }
-                return ConditionStatus.Met;
+                await reward.ExecuteReward(context, publisher);
             }
-            
-            return ConditionStatus.NotMet;
+            return ConditionStatus.Met;
+
         }
 
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(KycDepositParam, out var deposit)
+                && !Parameters.TryGetValue(KycTradeParam, out var trade)
+                && !Parameters.TryGetValue(KycWithdrawalParam, out var withdrawal)
+                && !bool.TryParse(deposit, out _kycDepositStatus)
+                && !bool.TryParse(trade, out _kycTradeStatus)
+                && !bool.TryParse(withdrawal, out _kycWithdrawalStatus))
+                throw new Exception("Invalid arguments");
+        }
+        
         public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);
 
         public static readonly Dictionary<string, string> ParamDictionary = new ();
