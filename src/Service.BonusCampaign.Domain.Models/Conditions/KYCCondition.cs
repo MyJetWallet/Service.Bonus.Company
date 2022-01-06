@@ -13,9 +13,9 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class KycCondition : ConditionBase
     {
-        private const string KycDepositParam = "KycDepositAllowed";
-        private const string KycTradeParam = "KycTradeAllowed";
-        private const string KycWithdrawalParam = "KycWithdrawalAllowed";
+        private const string KycDepositParam = "CheckDepositKyc";
+        private const string KycTradeParam = "CheckTradeKyc";
+        private const string KycWithdrawalParam = "CheckWithdrawalKyc";
         private bool _kycDepositStatus;
         private bool _kycTradeStatus;
         private bool _kycWithdrawalStatus;
@@ -89,6 +89,11 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         
         public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);
 
-        public static readonly Dictionary<string, string> ParamDictionary = new ();
+        public static readonly Dictionary<string, string> ParamDictionary = new ()
+        {
+            { KycDepositParam, typeof(bool).ToString() },
+            { KycTradeParam, typeof(bool).ToString() },
+            { KycWithdrawalParam, typeof(bool).ToString() }
+        };
     }
 }
