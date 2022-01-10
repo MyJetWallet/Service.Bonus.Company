@@ -28,8 +28,7 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly IServiceBusPublisher<ExecuteRewardMessage> _publisher;
         private readonly ILogger<CheckerJob> _logger;
         private readonly IConvertIndexPricesClient _pricesClient;
-        private readonly CampaignsRegistry _campaignsRegistry;
-        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger, IConvertIndexPricesClient pricesClient, CampaignsRegistry campaignsRegistry)
+        public CheckerJob(ISubscriber<ContextUpdate> subscriber, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextRepository contextRepository, CampaignRepository campaignRepository, IServiceBusPublisher<ExecuteRewardMessage> publisher, ILogger<CheckerJob> logger, IConvertIndexPricesClient pricesClient)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _contextRepository = contextRepository;
@@ -37,7 +36,6 @@ namespace Service.BonusCampaign.Worker.Jobs
             _publisher = publisher;
             _logger = logger;
             _pricesClient = pricesClient;
-            _campaignsRegistry = campaignsRegistry;
             subscriber.Subscribe(HandleUpdates);
         }
 
@@ -81,8 +79,6 @@ namespace Service.BonusCampaign.Worker.Jobs
                                 ExpirationTime = DateTime.UtcNow + condition.TimeToComplete
                             }).ToList()
                         });
-
-                        await _campaignsRegistry.AddCampaign(update.ClientId, campaign.Id);
                     }
                 }
 

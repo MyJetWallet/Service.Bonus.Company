@@ -14,12 +14,10 @@ namespace Service.BonusCampaign.Domain.Helpers
     {
         private readonly IMyNoSqlServerDataWriter<CampaignNoSqlEntity> _campaignWriter;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
-        private readonly CampaignsRegistry _campaignsRegistry;
 
-        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignsRegistry campaignsRegistry, IMyNoSqlServerDataWriter<CampaignNoSqlEntity> campaignWriter)
+        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, IMyNoSqlServerDataWriter<CampaignNoSqlEntity> campaignWriter)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
-            _campaignsRegistry = campaignsRegistry;
             _campaignWriter = campaignWriter;
         }
 
@@ -46,12 +44,10 @@ namespace Service.BonusCampaign.Domain.Helpers
                 .ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetActiveCampaigns(string clientId)
+        public async Task<List<Campaign>> GetActiveCampaignsForClient(string clientId)
         {
-            var ids = await _campaignsRegistry.GetActiveCampaignsForClient(clientId);
-
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            return await ctx.Campaigns.Include(c=>c.Conditions).ThenInclude(t=>t.Rewards).Where(campaign=>ids.Contains(campaign.Id)).ToListAsync();
+            return await ctx.Campaigns.Include(c=>c.Conditions).ThenInclude(t=>t.Rewards).Where(campaign=>campaign.Status== CampaignStatus.Active && campaign.CampaignClientContexts.Any(t=>t.ClientId == clientId)).ToListAsync();
         }
 
         public async Task SetActiveCampaigns(List<Campaign> campaigns)

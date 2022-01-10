@@ -43,6 +43,13 @@ namespace Service.BonusCampaign.Client
             var contextResponse = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
 
             var ids = campaigns.Select(t => t.Id).ToList();
+            if (!ids.Any())
+            {
+                return new CampaignStatsResponse
+                {
+                    Campaigns = new List<CampaignStatModel>()
+                };
+            }
             var contexts = contextResponse.Contexts.Where(t => ids.Contains(t.CampaignId)).ToList();
 
             var conditions = campaigns

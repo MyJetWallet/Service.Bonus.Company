@@ -16,13 +16,11 @@ namespace Service.BonusCampaign.Worker.Jobs
         private readonly CampaignRepository _campaignRepository;
         private readonly MyTaskTimer _timer;
         private readonly ILogger<CampaignCheckerJob> _logger;
-        private readonly CampaignsRegistry _campaignsRegistry;
 
-        public CampaignCheckerJob(CampaignRepository campaignRepository, ILogger<CampaignCheckerJob> logger, CampaignsRegistry campaignsRegistry)
+        public CampaignCheckerJob(CampaignRepository campaignRepository, ILogger<CampaignCheckerJob> logger)
         {
             _campaignRepository = campaignRepository;
             _logger = logger;
-            _campaignsRegistry = campaignsRegistry;
             _timer = MyTaskTimer.Create<CampaignCheckerJob>(TimeSpan.FromSeconds(60), logger, DoProcess);
         }
 
@@ -42,7 +40,6 @@ namespace Service.BonusCampaign.Worker.Jobs
                 campaign.Status = CampaignStatus.Finished;
             }
             await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
-            await _campaignsRegistry.RemoveCampaignForAll(finishedCampaigns.Select(t=>t.Id).ToList());
             _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }
 

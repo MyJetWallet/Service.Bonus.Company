@@ -28,7 +28,6 @@ namespace Service.BonusCampaign.Modules
             
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
-            builder.RegisterType<CampaignsRegistry>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
             
             builder.RegisterDynamicLinkClient(noSqlClient);

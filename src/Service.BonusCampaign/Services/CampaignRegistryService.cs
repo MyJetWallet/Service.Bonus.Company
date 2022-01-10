@@ -1,8 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Service.BonusCampaign.Domain;
-using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
@@ -13,12 +11,10 @@ namespace Service.BonusCampaign.Services
     public class CampaignRegistryService : ICampaignRegistry
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
-        private readonly CampaignsRegistry _campaignsRegistry;
 
-        public CampaignRegistryService(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignsRegistry campaignsRegistry)
+        public CampaignRegistryService(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
-            _campaignsRegistry = campaignsRegistry;
         }
 
         public async Task<ActiveCampaignsResponse> GetActiveCampaigns(GetActiveCampaignsRequest request)
@@ -30,8 +26,6 @@ namespace Service.BonusCampaign.Services
                 campaign.CampaignClientContexts.Any(context => context.ClientId == request.ClientId)).ToListAsync();
 
             var campaignsIds = campaigns.Select(campaign => campaign.Id).ToList();
-
-            await _campaignsRegistry.AddCampaigns(request.ClientId, campaignsIds);
 
             return new ActiveCampaignsResponse()
             {
