@@ -29,6 +29,9 @@ namespace Service.BonusCampaign.Domain.Helpers
                     campaign.CampaignClientContexts.All(context => context.ClientId != clientId))
                 .Include(t=>t.CriteriaList)
                 .Include(t=>t.Conditions)
+                .ThenInclude(t=>t.Rewards)
+                .Include(t=>t.CampaignClientContexts)
+                .ThenInclude(t=>t.Conditions)
                 .ToListAsync();
         }
 
