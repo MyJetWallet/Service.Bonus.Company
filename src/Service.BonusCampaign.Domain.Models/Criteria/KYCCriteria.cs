@@ -53,11 +53,11 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         private void Init()
         {
             if (!Parameters.TryGetValue(KycDepositParam, out var deposit)
-                && !Parameters.TryGetValue(KycTradeParam, out var trade)
-                && !Parameters.TryGetValue(KycWithdrawalParam, out var withdrawal)
-                && !bool.TryParse(deposit, out _kycDepositStatus)
-                && !bool.TryParse(trade, out _kycTradeStatus)
-                && !bool.TryParse(withdrawal, out _kycWithdrawalStatus))
+                || !Parameters.TryGetValue(KycTradeParam, out var trade)
+                || !Parameters.TryGetValue(KycWithdrawalParam, out var withdrawal)
+                || !bool.TryParse(deposit, out _kycDepositStatus)
+                || !bool.TryParse(trade, out _kycTradeStatus)
+                || !bool.TryParse(withdrawal, out _kycWithdrawalStatus))
                 throw new Exception("Invalid arguments");
         }
     }
