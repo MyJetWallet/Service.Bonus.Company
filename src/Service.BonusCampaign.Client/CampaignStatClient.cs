@@ -39,10 +39,21 @@ namespace Service.BonusCampaign.Client
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
         {
-            var campaigns = _campaignReader.Get().Select(t=>t.Campaign).Where(campaign=>campaign.Contexts.Any(context=>context.ClientId == request.ClientId)).ToList();
-            var contextResponse = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
+            //List<Campain>
 
-            var ids = campaigns.Select(t => t.Id).ToList();
+            var campaignList = _campaignReader.Get().Select(t => t.Campaign).ToList();
+
+                //todo: починить GetActiveContextsByClient
+            //var contextResponse = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
+            var clientContextList = await _contextClient.GetContextsByClient(new GetContextsByClientRequest
+            {
+                ClientId = request.ClientId
+            });
+            
+            
+            
+
+            var ids = campaignList.Where(e => e.Status== CampaignStatus.Active).Select(t => t.Id).ToList();
             if (!ids.Any())
             {
                 return new CampaignStatsResponse
@@ -50,9 +61,9 @@ namespace Service.BonusCampaign.Client
                     Campaigns = new List<CampaignStatModel>()
                 };
             }
-            var contexts = contextResponse.Contexts.Where(t => ids.Contains(t.CampaignId)).ToList();
+            var contexts = clientContextList.Contexts.Where(t => ids.Contains(t.CampaignId)).ToList();
 
-            var conditions = campaigns
+            var conditions = campaignList
                 .SelectMany(t => t.Conditions)
                 .ToList();
 
@@ -65,7 +76,7 @@ namespace Service.BonusCampaign.Client
 
             foreach (var context in contexts)
             {
-                var campaign = campaigns.First(t => t.Id == context.CampaignId);
+                var campaign = campaignList.First(t => t.Id == context.CampaignId);
 
                 var conditionStates = context.Conditions
                     .Where(t => t.Type != ConditionType.ConditionsCondition)

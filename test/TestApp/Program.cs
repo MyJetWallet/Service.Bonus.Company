@@ -19,7 +19,7 @@ namespace TestApp
     {
         static async Task Main(string[] args)
         {
-            var clientId = "7c8fd6b8087d40998a3a46e3dc06263c";
+            var clientId = "62817710c2794afb9648e28b6203161d";
             GrpcClientFactory.AllowUnencryptedHttp2 = true;
             var myNoSqlClient = new MyNoSqlTcpClient(() => "192.168.70.80:5125", "BonusCampaignTestApp");
             
