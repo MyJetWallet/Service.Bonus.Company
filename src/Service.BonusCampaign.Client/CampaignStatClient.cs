@@ -39,20 +39,18 @@ namespace Service.BonusCampaign.Client
 
         public async Task<CampaignStatsResponse> GetCampaignsStats(CampaignStatRequest request)
         {
-            //List<Campain>
-
             var campaignList = _campaignReader.Get().Select(t => t.Campaign).ToList();
-
-                //todo: починить GetActiveContextsByClient
-            //var contextResponse = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest() { ClientId = request.ClientId });
-            var clientContextList = await _contextClient.GetContextsByClient(new GetContextsByClientRequest
+            var clientContextList = await _contextClient.GetActiveContextsByClient(new GetContextsByClientRequest
             {
                 ClientId = request.ClientId
             });
-            
-            
-            
-
+            if (clientContextList.Contexts == null || !clientContextList.Contexts.Any())
+            {
+                return new CampaignStatsResponse
+                {
+                    Campaigns = new List<CampaignStatModel>()
+                };
+            }
             var ids = campaignList.Where(e => e.Status== CampaignStatus.Active).Select(t => t.Id).ToList();
             if (!ids.Any())
             {

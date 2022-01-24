@@ -36,15 +36,20 @@ namespace Service.BonusCampaign.Services
         public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId && !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked));
-
+            var contexts = ctx.CampaignClientContexts
+                .Where(t => t.ClientId == request.ClientId)
+                .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked))
+                .Skip(request.Skip);
+            
             if (request.Take != 0)
                 contexts = contexts.Take(request.Take);
 
-            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
             return new GetContextsByClientResponse()
             {
-                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
+                Contexts = await contexts
+                    .Include(t => t.Conditions)
+                    .Select(t => t.ToGrpcModel()).
+                    ToListAsync()
             };
         }
     }
