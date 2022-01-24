@@ -18,38 +18,54 @@ namespace Service.BonusCampaign.Services
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
 
-        public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
+        public async Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId);
 
             if (request.Take != 0)
-               contexts = contexts.Take(request.Take);
+                contexts = contexts.Take(request.Take);
 
             contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
-            return new GetContextsByClientResponse()
+            return new GetContextsResponse()
             {
                 Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
             };
         }
 
-        public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
+        public async Task<GetContextsResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             var contexts = ctx.CampaignClientContexts
                 .Where(t => t.ClientId == request.ClientId)
-                .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions => conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked))
+                .Where(t => !t.Conditions.Any() || t.Conditions.All(conditions =>
+                    conditions.Status != ConditionStatus.Expired && conditions.Status != ConditionStatus.Blocked))
                 .Skip(request.Skip);
-            
+
             if (request.Take != 0)
                 contexts = contexts.Take(request.Take);
 
-            return new GetContextsByClientResponse()
+            return new GetContextsResponse()
             {
                 Contexts = await contexts
                     .Include(t => t.Conditions)
-                    .Select(t => t.ToGrpcModel()).
-                    ToListAsync()
+                    .Select(t => t.ToGrpcModel()).ToListAsync()
+            };
+        }
+
+
+        public async Task<GetContextsResponse> GetContextsByCampaign(GetContextsByCampaignRequest request)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            var contexts = ctx.CampaignClientContexts.Where(t => t.CampaignId == request.CampaignId);
+
+            if (request.Take != 0)
+                contexts = contexts.Take(request.Take);
+
+            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
+            return new GetContextsResponse()
+            {
+                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
             };
         }
     }

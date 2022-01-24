@@ -21,12 +21,12 @@ namespace Service.BonusCampaign.Client
             _contextService = contextService;
         }
 
-        public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
+        public async Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request)
         {
             var entity = _reader.Get(CampaignClientContextNoSqlEntity.GeneratePartitionKey(request.ClientId));
             if (entity != null && entity.Any())
             {
-                return new GetContextsByClientResponse
+                return new GetContextsResponse
                 {
                     Contexts = request.Take != 0 
                         ? entity.Skip(request.Skip).Take(request.Take).Select(t => t.Context.ToGrpcModel()).ToList()
@@ -37,12 +37,12 @@ namespace Service.BonusCampaign.Client
             return await _contextService.GetContextsByClient(request);
         }
         
-        public async Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
+        public async Task<GetContextsResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
             var entity = _reader.Get(CampaignClientContextNoSqlEntity.GeneratePartitionKey(request.ClientId));
             if (entity != null && entity.Any())
             { 
-                return new GetContextsByClientResponse
+                return new GetContextsResponse
                 {
                     Contexts = request.Take != 0 
                         ? entity.Skip(request.Skip).Take(request.Take).Select(t => t.Context.ToGrpcModel())

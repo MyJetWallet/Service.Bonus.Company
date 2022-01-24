@@ -25,13 +25,15 @@ namespace Service.BonusCampaign.Services
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignRepository _campaignRepository;
         private readonly CampaignClientContextRepository _contextRepository;
+        private readonly ClientContextService _contextService;
 
-        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignRepository campaignRepository, CampaignClientContextRepository contextRepository)
+        public CampaignManager(ILogger<CampaignManager> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignRepository campaignRepository, CampaignClientContextRepository contextRepository, ClientContextService contextService)
         {
             _logger = logger;
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _campaignRepository = campaignRepository;
             _contextRepository = contextRepository;
+            _contextService = contextService;
         }
 
         public async Task<OperationResponse> CreateOrUpdateCampaign(CampaignGrpcModel request)
@@ -125,16 +127,9 @@ namespace Service.BonusCampaign.Services
             List<ParamsDict> ToListOfParams(Dictionary<string, string> parameters) => parameters.Select(keyValuePair => new ParamsDict { ParamName = keyValuePair.Key, ParamType = keyValuePair.Value }).ToList();
         }
 
-        public async Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request)
-        {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId)
-                .Include(t => t.Conditions).Select(t => t.ToGrpcModel()).ToList();
-            return new GetContextsByClientResponse()
-            {
-                Contexts = contexts
-            };
-        }
+        public async Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request) => await _contextService.GetContextsByClient(request);
+
+        public async Task<GetContextsResponse> GetContextsByCampaign(GetContextsByCampaignRequest request) => await _contextService.GetContextsByCampaign(request);
 
         public async Task<OperationResponse> BlockUserInCampaign(BlockUserRequest request)
         {

@@ -8,9 +8,9 @@ namespace Service.BonusCampaign.Grpc
     public interface IClientContextService
     {
         [OperationContract]
-        Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request);
+        Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request);
         
         [OperationContract]
-        Task<GetContextsByClientResponse> GetActiveContextsByClient(GetContextsByClientRequest request);
+        Task<GetContextsResponse> GetActiveContextsByClient(GetContextsByClientRequest request);
     }
 }

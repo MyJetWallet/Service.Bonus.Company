@@ -18,7 +18,10 @@ namespace Service.BonusCampaign.Grpc
         ParamsResponse GetAllParams();
 
         [OperationContract]
-        Task<GetContextsByClientResponse> GetContextsByClient(GetContextsByClientRequest request);
+        Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request);
+        
+        [OperationContract]
+        Task<GetContextsResponse> GetContextsByCampaign(GetContextsByCampaignRequest request);
         
         [OperationContract]
         Task<OperationResponse> BlockUserInCampaign(BlockUserRequest request);
