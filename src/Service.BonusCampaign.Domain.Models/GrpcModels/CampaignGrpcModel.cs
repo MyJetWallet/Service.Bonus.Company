@@ -23,7 +23,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 7)] public string ImageUrl { get; set; }
         [DataMember(Order = 8)] public List<AccessCriteriaGrpcModel> CriteriaList { get; set; }
         [DataMember(Order = 9)] public List<ConditionGrpcModel> Conditions { get; set; }
-        [DataMember(Order = 10)] public List<CampaignClientContextGrpcModel> Contexts { get; set; }
+        // [DataMember(Order = 10)] public List<CampaignClientContextGrpcModel> Contexts { get; set; }
         [DataMember(Order = 11)] public string DescriptionTemplateId { get; set; }
         [DataMember(Order = 12)] public string SerializedRequest { get; set; }
         [DataMember(Order = 13)] public ActionEnum Action { get; set; }
@@ -160,7 +160,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 ImageUrl = campaign.ImageUrl,
                 CriteriaList = campaign.CriteriaList?.Select(ToGrpcModel).ToList() ?? new (),
                 Conditions = campaign.Conditions?.Select(ToGrpcModel).ToList() ?? new (),
-                Contexts = campaign.CampaignClientContexts?.Select(ToGrpcModel).ToList() ?? new (),
+                //Contexts = campaign.CampaignClientContexts?.Select(ToGrpcModel).ToList() ?? new (),
                 SerializedRequest = campaign.SerializedRequest,
                 Action = campaign.Action,
                 Name = campaign.Name,

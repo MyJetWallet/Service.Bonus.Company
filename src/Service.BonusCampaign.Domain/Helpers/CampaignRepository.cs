@@ -14,11 +14,12 @@ namespace Service.BonusCampaign.Domain.Helpers
     {
         private readonly IMyNoSqlServerDataWriter<CampaignNoSqlEntity> _campaignWriter;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
-
-        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, IMyNoSqlServerDataWriter<CampaignNoSqlEntity> campaignWriter)
+        private readonly CampaignClientContextCacheManager _contextCacheManager;
+        public CampaignRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, IMyNoSqlServerDataWriter<CampaignNoSqlEntity> campaignWriter, CampaignClientContextCacheManager contextCacheManager)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _campaignWriter = campaignWriter;
+            _contextCacheManager = contextCacheManager;
         }
 
         public async Task<List<Campaign>> GetCampaignsWithoutThisClient(string clientId)
@@ -56,6 +57,7 @@ namespace Service.BonusCampaign.Domain.Helpers
         public async Task SetActiveCampaigns(List<Campaign> campaigns)
         {
             await _campaignWriter.BulkInsertOrReplaceAsync(campaigns.Select(CampaignNoSqlEntity.Create));
+            await _contextCacheManager.UpdateContext(campaigns);
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(campaigns);
         }
@@ -67,6 +69,7 @@ namespace Service.BonusCampaign.Domain.Helpers
                 await _campaignWriter.DeleteAsync(CampaignNoSqlEntity.GeneratePartitionKey(),
                     CampaignNoSqlEntity.GenerateRowKey(campaign.Id));
             }
+            await _contextCacheManager.UpdateContext(campaigns);
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(campaigns);
         }
@@ -82,6 +85,7 @@ namespace Service.BonusCampaign.Domain.Helpers
                 .ThenInclude(t=>t.Conditions)
                 .FirstOrDefaultAsync(t=>t.Id == campaignId);
 
+            await _contextCacheManager.UpdateContext(new List<Campaign>(){campaign});
             await _campaignWriter.InsertOrReplaceAsync(CampaignNoSqlEntity.Create(campaign));
         }
     }

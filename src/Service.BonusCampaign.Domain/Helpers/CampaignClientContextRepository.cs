@@ -12,16 +12,21 @@ namespace Service.BonusCampaign.Domain.Helpers
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignClientContextCacheManager _clientContextCache;
+        private readonly CampaignRepository _campaignRepository;
 
-        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextCacheManager clientContextCache)
+        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextCacheManager clientContextCache, CampaignRepository campaignRepository)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _clientContextCache = clientContextCache;
+            _campaignRepository = campaignRepository;
         }
         
         public async Task<List<CampaignClientContext>> GetContextById(string clientId)
         {
-            var cached = await _clientContextCache.GetActiveContextsByClient(clientId);
+            var activeCampaigns = await _campaignRepository.GetActiveCampaignsForClient(clientId);
+            var activeCampaignsIds = activeCampaigns.Select(t => t.Id).ToList();
+            
+            var cached = await _clientContextCache.GetActiveContextsByClient(activeCampaignsIds, clientId);
             if (cached != null)
                 return cached;
             
