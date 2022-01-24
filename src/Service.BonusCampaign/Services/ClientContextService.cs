@@ -21,15 +21,19 @@ namespace Service.BonusCampaign.Services
         public async Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = ctx.CampaignClientContexts.Where(t => t.ClientId == request.ClientId);
+            var contexts = ctx.CampaignClientContexts
+                .Where(t => t.ClientId == request.ClientId)
+                .Skip(request.Skip);
 
             if (request.Take != 0)
                 contexts = contexts.Take(request.Take);
 
-            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
             return new GetContextsResponse()
             {
-                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
+                Contexts = await contexts
+                    .Include(t => t.Conditions)
+                    .Select(t => t.ToGrpcModel())
+                    .ToListAsync()
             };
         }
 
@@ -57,15 +61,19 @@ namespace Service.BonusCampaign.Services
         public async Task<GetContextsResponse> GetContextsByCampaign(GetContextsByCampaignRequest request)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var contexts = ctx.CampaignClientContexts.Where(t => t.CampaignId == request.CampaignId);
-
+            var contexts = ctx.CampaignClientContexts
+                .Where(t => t.CampaignId == request.CampaignId)
+                .Skip(request.Skip);
+            
             if (request.Take != 0)
                 contexts = contexts.Take(request.Take);
-
-            contexts = contexts.Skip(request.Skip).Include(t => t.Conditions);
+            
             return new GetContextsResponse()
             {
-                Contexts = await contexts.Select(t => t.ToGrpcModel()).ToListAsync()
+                Contexts = await contexts.
+                    Include(t => t.Conditions)
+                    .Select(t => t.ToGrpcModel())
+                    .ToListAsync()
             };
         }
     }

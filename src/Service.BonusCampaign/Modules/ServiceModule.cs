@@ -6,6 +6,7 @@ using MyJetWallet.Sdk.NoSql;
 using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.NoSql;
+using Service.BonusCampaign.Services;
 using Service.MessageTemplates.Client;
 
 namespace Service.BonusCampaign.Modules
@@ -26,6 +27,7 @@ namespace Service.BonusCampaign.Modules
             
             builder.RegisterMessageTemplatesCachedClient(Program.Settings.MessageTemplatesGrpcServiceUrl, noSqlClient);
             
+            builder.RegisterType<ClientContextService>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextRepository>().AsSelf().SingleInstance();
             builder.RegisterType<CampaignClientContextCacheManager>().AsSelf().SingleInstance();
