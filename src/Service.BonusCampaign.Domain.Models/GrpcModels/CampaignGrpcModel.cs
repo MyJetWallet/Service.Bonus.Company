@@ -51,6 +51,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 5)] public ConditionStatus Status { get; set; }
         [DataMember(Order = 6)] public string ConditionId { get; set; }
         [DataMember(Order = 7)] public TimeSpan TimeToComplete { get; set; }
+        [DataMember(Order = 8)] public ActionEnum Action { get; set; }
     }
     
     [DataContract]
@@ -133,7 +134,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 Parameters = conditionBase.Parameters,
                 Rewards = conditionBase.Rewards.Select(ToGrpcModel).ToList(),
                 Status = conditionBase.Status,
-                TimeToComplete = conditionBase.TimeToComplete
+                TimeToComplete = conditionBase.TimeToComplete,
+                Action = conditionBase.Action
             };
         }
         

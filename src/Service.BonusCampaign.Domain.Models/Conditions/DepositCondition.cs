@@ -7,6 +7,7 @@ using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions
@@ -21,11 +22,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override List<RewardBase> Rewards { get; set; }
         public override ConditionStatus Status { get; set; }
         public override TimeSpan TimeToComplete { get; set; }
+        public override ActionEnum Action { get; set; }
 
         public DepositCondition()
         {
         }
-        public DepositCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete)
+        public DepositCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action)
         {
             Type = ConditionType.DepositCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -36,6 +38,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Parameters = parameters;
             Rewards = rewards;
             TimeToComplete = timeToComplete;
+            Action = action;
+
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;

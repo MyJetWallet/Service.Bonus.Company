@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Service.BonusCampaign.Domain.Models.Enums;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models.Stats
 {
@@ -26,6 +27,8 @@ namespace Service.BonusCampaign.Domain.Models.Stats
         [DataMember(Order = 1)]public ConditionType Type { get; set; }
         [DataMember(Order = 2)]public Dictionary<string, string> Params { get; set; }
         [DataMember(Order = 3)]public RewardStatModel Reward { get; set; }
+        [DataMember(Order = 4)]public string DeepLink { get; set; }
+        [DataMember(Order = 5)]public string DeepLinkWeb { get; set; }
     }
     
     [DataContract]

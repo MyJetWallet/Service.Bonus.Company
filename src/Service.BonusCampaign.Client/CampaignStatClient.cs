@@ -109,6 +109,9 @@ namespace Service.BonusCampaign.Client
             //locals 
             ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewardsList)
             {
+                var condition = conditions.First(t => t.ConditionId == state.ConditionId);
+                var (longLink, shortLink) = GenerateDeepLink(condition.Action, null, request.Brand);
+
                 switch (state.Type)
                 {
                     case ConditionType.KYCCondition:
@@ -117,7 +120,9 @@ namespace Service.BonusCampaign.Client
                             Type = ConditionType.KYCCondition,
                             Params = new Dictionary<string, string>()
                                 { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  } },
-                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
+                            DeepLink = shortLink,
+                            DeepLinkWeb = longLink,
                         };
                     case ConditionType.TradeCondition:
                     {
@@ -125,8 +130,6 @@ namespace Service.BonusCampaign.Client
 
                         if (string.IsNullOrEmpty(state.Params))
                         {
-                            var condition = conditions.First(t => t.ConditionId == state.ConditionId);
-
                             var condParams = condition.Parameters;
                             paramsModel = new TradeParamsModel
                             {
@@ -150,7 +153,9 @@ namespace Service.BonusCampaign.Client
                                 { "TradedAmount", paramsModel.TradeAmount.ToString() },
                                 { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }
                             },
-                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
+                            DeepLink = shortLink,
+                            DeepLinkWeb = longLink,
                         };
                     }
                     case ConditionType.DepositCondition:
@@ -159,7 +164,9 @@ namespace Service.BonusCampaign.Client
                             Type = ConditionType.DepositCondition,
                             Params = new Dictionary<string, string>()
                                 { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower() } },
-                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId))
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
+                            DeepLink = shortLink,
+                            DeepLinkWeb = longLink,
                         };
                     default:
                         return null;
@@ -192,29 +199,30 @@ namespace Service.BonusCampaign.Client
             {
                 switch (action)
                 {
-                    case ActionEnum.None:
-                        return (String.Empty, String.Empty);
-                    case ActionEnum.Login:
-                        return _dynamicLinkClient.GenerateLoginLink(new GenerateLoginLinkRequest()
-                        {
-                            Brand = brand,
-                            DeviceType = DeviceTypeEnum.Unknown
-                        });
-                    case ActionEnum.ConfirmEmail:
-                        if(string.IsNullOrWhiteSpace(serializedRequest))
-                            return (String.Empty, String.Empty);
-                        var linkRequest = JsonSerializer.Deserialize<GenerateConfirmEmailLinkRequest>(serializedRequest);
-                        if (linkRequest == null) 
-                            return (String.Empty, String.Empty);
-                        linkRequest.Brand = brand;
-                        linkRequest.DeviceType = DeviceTypeEnum.Unknown;
-                        return _dynamicLinkClient.GenerateConfirmEmailLink(linkRequest);
                     case ActionEnum.InviteFriend:
-                        return _dynamicLinkClient.GenerateInviteFriendLink(new GenerateInviteFriendLinkRequest()
+                        return _dynamicLinkClient.GenerateInviteFriendLink(new ()
                         {
                             Brand = brand,
                             DeviceType = DeviceTypeEnum.Unknown
                         });;
+                    case ActionEnum.KycVerification:
+                        return _dynamicLinkClient.GenerateKycVerificationLink(new ()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });;
+                    case ActionEnum.DepositStart:
+                        return _dynamicLinkClient.GenerateDepositStartLink(new ()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });;;
+                    case ActionEnum.TradingStart:
+                        return _dynamicLinkClient.GenerateTradingStartLink(new ()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });;;
                     default:
                         return (String.Empty, String.Empty);
                 }

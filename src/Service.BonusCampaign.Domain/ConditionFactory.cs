@@ -6,23 +6,24 @@ using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain
 {
     public static class ConditionFactory
     {
-        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete)
+        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete, ActionEnum action)
         {
             switch (type)
             {
                 case ConditionType.KYCCondition:
-                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
+                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
                 case ConditionType.TradeCondition:
-                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
+                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
                 case ConditionType.DepositCondition:
-                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
+                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
                 case ConditionType.ConditionsCondition:
-                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete);
+                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
                 case ConditionType.ReferralCondition:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

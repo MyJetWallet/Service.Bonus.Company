@@ -7,6 +7,7 @@ using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions
@@ -21,7 +22,9 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract List<RewardBase> Rewards { get; set; }
         public abstract ConditionStatus Status { get; set; }
         public abstract TimeSpan TimeToComplete { get; set; }
-
+        public abstract ActionEnum Action { get; set; }
+        
+        
         public abstract Dictionary<string, string> GetParams();
         public abstract Task<ConditionStatus> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);
         public abstract Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient);

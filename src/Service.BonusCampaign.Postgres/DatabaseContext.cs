@@ -11,6 +11,7 @@ using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
+using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Postgres
 {
@@ -97,6 +98,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().HasKey(e => e.ConditionId);
             modelBuilder.Entity<ConditionBase>().Property(e => e.CampaignId).HasMaxLength(128);
             modelBuilder.Entity<ConditionBase>().Property(e => e.Parameters).HasColumnType("jsonb");
+            modelBuilder.Entity<ConditionBase>().Property(e => e.Action).HasDefaultValue(ActionEnum.None);
 
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition)
