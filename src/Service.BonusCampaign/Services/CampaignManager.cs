@@ -71,7 +71,8 @@ namespace Service.BonusCampaign.Services
                     Action = request.Action,
                     Name = request.Name,
                     Weight = request.Weight,
-                    ShowReferrerStats = request.ShowReferrerStats
+                    ShowReferrerStats = request.ShowReferrerStats,
+                    CampaignType = string.IsNullOrWhiteSpace(request.CampaignType) ? CampaignTypes.None : request.CampaignType
                 };
                 
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);

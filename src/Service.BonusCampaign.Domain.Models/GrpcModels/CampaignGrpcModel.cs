@@ -30,6 +30,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 14)] public string Name { get; set; }
         [DataMember(Order = 15)] public int Weight { get; set; }
         [DataMember(Order = 16)] public bool ShowReferrerStats { get; set; }
+        [DataMember(Order = 17)] public string CampaignType { get; set; }
     }
 
     [DataContract]
@@ -167,7 +168,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 Action = campaign.Action,
                 Name = campaign.Name,
                 Weight = campaign.Weight,
-                ShowReferrerStats = campaign.ShowReferrerStats
+                ShowReferrerStats = campaign.ShowReferrerStats,
+                CampaignType = campaign.CampaignType
             };
         }
         

@@ -65,6 +65,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<Campaign>().Property(e => e.ImageUrl).HasMaxLength(128);
             modelBuilder.Entity<Campaign>().Property(e => e.FromDateTime).HasDefaultValue(DateTime.MinValue);
             modelBuilder.Entity<Campaign>().Property(e => e.ToDateTime).HasDefaultValue(DateTime.MinValue);
+            modelBuilder.Entity<Campaign>().Property(e => e.CampaignType).HasDefaultValue(CampaignTypes.None);
 
             modelBuilder.Entity<Campaign>().HasIndex(e => e.IsEnabled);
             modelBuilder.Entity<Campaign>().HasIndex(e => e.FromDateTime);
