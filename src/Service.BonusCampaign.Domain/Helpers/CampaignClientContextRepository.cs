@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,7 +40,8 @@ namespace Service.BonusCampaign.Domain.Helpers
                 where campaign.Status == CampaignStatus.Active
                 select context;
 
-           return await query.Include(t=>t.Conditions).ToListAsync();
+           var ret = await query.Include(t=>t.Conditions).ToListAsync();
+           return ret;
         }
         
         public async Task UpsertContext(List<CampaignClientContext> contexts)

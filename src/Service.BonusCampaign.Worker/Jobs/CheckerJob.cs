@@ -49,7 +49,6 @@ namespace Service.BonusCampaign.Worker.Jobs
         {
             try
             {
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 var contexts = new List<CampaignClientContext>();
 
                 var campaigns = await _campaignRepository.GetCampaignsWithoutThisClient(update.ClientId);
@@ -87,7 +86,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             catch (Exception e)
             {
                 _logger.LogError(e, "When checking criteria for update {requestJson}", JsonSerializer.Serialize(update));
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
                 throw;
             }
         }
@@ -96,21 +95,11 @@ namespace Service.BonusCampaign.Worker.Jobs
         {
             try
             {
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-
                 var contexts = await _contextRepository.GetContextById(update.ClientId);
-                var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
-                var conditions = ctx.Conditions
-                    .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                        && condition.Type == update.EventType.ToConditionType())
-                    .Include(condition => condition.Rewards)
-                    .ToList();
 
-                var afterConditions = ctx.Conditions
-                    .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                        && condition.Type == ConditionType.ConditionsCondition)
-                    .Include(condition => condition.Rewards)
-                    .ToList();
+                var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
+
+                var (conditions, afterConditions) = await GetCondition(conditionIds, update.EventType);
                 
                 foreach (var context in contexts)
                 {
@@ -142,9 +131,28 @@ namespace Service.BonusCampaign.Worker.Jobs
             {
                 _logger.LogError(e, "When checking conditions for update {requestJson}",
                     JsonSerializer.Serialize(update));
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
                 throw;
             }
+        }
+
+        private async Task<(List<ConditionBase>, List<ConditionBase>)> GetCondition(List<string> conditionIds, EventType eventType)
+        {
+            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+            var conditions = ctx.Conditions
+                .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                    && condition.Type == eventType.ToConditionType())
+                .Include(condition => condition.Rewards)
+                .ToList();
+
+            var afterConditions = ctx.Conditions
+                .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                    && condition.Type == ConditionType.ConditionsCondition)
+                .Include(condition => condition.Rewards)
+                .ToList();
+
+            return (conditions, afterConditions);
         }
     }
 }

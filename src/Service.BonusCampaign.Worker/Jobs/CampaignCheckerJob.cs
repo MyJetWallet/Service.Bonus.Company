@@ -26,21 +26,34 @@ namespace Service.BonusCampaign.Worker.Jobs
 
         private async Task DoProcess()
         {
-            var campaigns = await _campaignRepository.GetCampaigns();
-            var activeCampaigns = campaigns.Where(t => t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled && t.Status != CampaignStatus.Active).ToList();
-            foreach (var campaign in activeCampaigns)
+            try
             {
-                campaign.Status = CampaignStatus.Active;
+                var campaigns = await _campaignRepository.GetCampaigns();
+                var activeCampaigns = campaigns.Where(t =>
+                    t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled &&
+                    t.Status != CampaignStatus.Active).ToList();
+                foreach (var campaign in activeCampaigns)
+                {
+                    campaign.Status = CampaignStatus.Active;
+                }
+
+                await _campaignRepository.SetActiveCampaigns(activeCampaigns);
+
+                var finishedCampaigns = campaigns
+                    .Where(t => t.ToDateTime <= DateTime.UtcNow && t.Status != CampaignStatus.Finished).ToList();
+                foreach (var campaign in finishedCampaigns)
+                {
+                    campaign.Status = CampaignStatus.Finished;
+                }
+
+                await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
+                _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished",
+                    activeCampaigns.Count, finishedCampaigns.Count);
             }
-            await _campaignRepository.SetActiveCampaigns(activeCampaigns);
-            
-            var finishedCampaigns = campaigns.Where(t => t.ToDateTime <= DateTime.UtcNow && t.Status != CampaignStatus.Finished).ToList();
-            foreach (var campaign in finishedCampaigns)
+            catch (Exception e)
             {
-                campaign.Status = CampaignStatus.Finished;
+                _logger.LogError(e, "When updating campaigns statuses");
             }
-            await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
-            _logger.LogInformation("Set {activeCount} campaigns as active and {finishedCount} as finished", activeCampaigns.Count, finishedCampaigns.Count);
         }
 
         public void Start()

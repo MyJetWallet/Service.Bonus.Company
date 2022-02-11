@@ -25,7 +25,7 @@ namespace Service.BonusCampaign.Domain.Helpers
         public async Task<List<Campaign>> GetCampaignsWithoutThisClient(string clientId)
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            return await ctx.Campaigns.Where(campaign =>
+            var ret = await ctx.Campaigns.Where(campaign =>
                     campaign.Status == CampaignStatus.Active &&
                     campaign.CampaignClientContexts.All(context => context.ClientId != clientId))
                 .Include(t=>t.CriteriaList)
@@ -34,6 +34,8 @@ namespace Service.BonusCampaign.Domain.Helpers
                 .Include(t=>t.CampaignClientContexts)
                 .ThenInclude(t=>t.Conditions)
                 .ToListAsync();
+            
+            return ret;
         }
 
         public async Task<List<Campaign>> GetCampaigns()
@@ -61,7 +63,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             await ctx.UpsertAsync(campaigns);
         }
-
+        
         public async Task SetFinishedCampaigns(List<Campaign> campaigns)
         {
             foreach (var campaign in campaigns)
