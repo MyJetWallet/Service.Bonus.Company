@@ -96,6 +96,9 @@ namespace Service.BonusCampaign.Worker.Jobs
         {
             try
             {
+                if(update.EventType == EventType.ManualCheckEvent)
+                    return;
+                
                 var contexts = await _contextRepository.GetContextById(update.ClientId);
 
                 var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();

@@ -114,6 +114,10 @@ namespace Service.BonusCampaign.Postgres
 
             modelBuilder.Entity<ConditionBase>().HasOne<Campaign>().WithMany(t => t.Conditions).HasForeignKey(t=>t.CampaignId);
 
+            modelBuilder.Entity<ConditionBase>().HasIndex(e => e.Type);
+            modelBuilder.Entity<ConditionBase>().HasIndex(e => new {e.CampaignId, e.Type});
+
+
         }
         
         private void SetRewards(ModelBuilder modelBuilder)
@@ -142,6 +146,9 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<CampaignClientContext>().Property(e => e.ActivationTime).HasDefaultValue(DateTime.MinValue);
             modelBuilder.Entity<CampaignClientContext>().HasOne<Campaign>().WithMany(t => t.CampaignClientContexts).HasForeignKey(t=>t.CampaignId);
+            
+            modelBuilder.Entity<CampaignClientContext>().HasIndex(e => e.ClientId);
+
         }
 
         private void SetConditionStates(ModelBuilder modelBuilder)
@@ -152,7 +159,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ConditionId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.CampaignId).HasMaxLength(128);
             modelBuilder.Entity<ClientConditionState>().Property(e => e.ExpirationTime).HasDefaultValue(DateTime.MinValue);
-
+            
             modelBuilder.Entity<ClientConditionState>().HasOne<CampaignClientContext>().WithMany(t => t.Conditions).HasForeignKey(t=>new {t.ClientId, t.CampaignId});
         }
         
