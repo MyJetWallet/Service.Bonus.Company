@@ -33,17 +33,19 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
+
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+                var campaigns = await ctx.CampaignClientContexts.Where(context => context.ClientId != clientId)
+                    .Select(t => t.CampaignId).ToListAsync();
+                
                 var ret = await ctx.Campaigns.Where(campaign =>
                         campaign.Status == CampaignStatus.Active &&
-                        campaign.CampaignClientContexts.All(context => context.ClientId != clientId))
+                        campaigns.Contains(campaign.Id))
                     .Include(t => t.CriteriaList)
                     .Include(t => t.Conditions)
-                    .ThenInclude(t => t.Rewards)
-                    .Include(t => t.CampaignClientContexts)
-                    .ThenInclude(t => t.Conditions)
                     .ToListAsync();
-
+                
                 return ret;
             }
             catch (Exception e)
