@@ -47,5 +47,6 @@ namespace Service.BonusCampaign
             builder.RegisterModule<SettingsModule>();
             builder.RegisterModule<ServiceModule>();
         }
+        
     }
 }
