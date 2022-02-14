@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Postgres;
@@ -13,43 +15,72 @@ namespace Service.BonusCampaign.Domain.Helpers
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly CampaignClientContextCacheManager _clientContextCache;
-        private readonly CampaignRepository _campaignRepository;
-
-        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextCacheManager clientContextCache, CampaignRepository campaignRepository)
+        private readonly ILogger<CampaignClientContextRepository> _logger;
+        public CampaignClientContextRepository(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, CampaignClientContextCacheManager clientContextCache, ILogger<CampaignClientContextRepository> logger)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
             _clientContextCache = clientContextCache;
-            _campaignRepository = campaignRepository;
+            _logger = logger;
         }
-        
+
         public async Task<List<CampaignClientContext>> GetContextById(string clientId)
         {
-            var activeCampaigns = await _campaignRepository.GetActiveCampaignsForClient(clientId);
-            var activeCampaignsIds = activeCampaigns.Select(t => t.Id).ToList();
-            
-            var cached = await _clientContextCache.GetActiveContextsByClient(activeCampaignsIds, clientId);
-            if (cached != null)
-                return cached;
-            
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            var query =
-                from context in ctx.CampaignClientContexts
-                where context.ClientId == clientId
-                join campaign in ctx.Campaigns
-                    on context.CampaignId equals campaign.Id
-                where campaign.Status == CampaignStatus.Active
-                select context;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var activeCampaigns = await ctx.Campaigns.Include(c=>c.Conditions).ThenInclude(t=>t.Rewards).Where(campaign=>campaign.Status== CampaignStatus.Active && campaign.CampaignClientContexts.Any(t=>t.ClientId == clientId)).ToListAsync();
+                var activeCampaignsIds = activeCampaigns.Select(t => t.Id).ToList();
+                
+                var cached = await _clientContextCache.GetActiveContextsByClient(activeCampaignsIds, clientId);
+                if (cached != null)
+                    return cached;
 
-           var ret = await query.Include(t=>t.Conditions).ToListAsync();
-           return ret;
+                var query =
+                    from context in ctx.CampaignClientContexts
+                    where context.ClientId == clientId
+                    join campaign in ctx.Campaigns
+                        on context.CampaignId equals campaign.Id
+                    where campaign.Status == CampaignStatus.Active
+                    select context;
+
+                var ret = await query.Include(t => t.Conditions).ToListAsync();
+                return ret;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When executing GetContextById for client {clientId}", clientId);
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogInformation("GetContextById ran for {time}", stopwatch.Elapsed);
+            }
         }
         
         public async Task UpsertContext(List<CampaignClientContext> contexts)
         {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-            await ctx.UpsertAsync(contexts);
-            await ctx.UpsertAsync(contexts.SelectMany(t => t.Conditions));
-            await _clientContextCache.UpdateContext(contexts);
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                await ctx.UpsertAsync(contexts);
+                await ctx.UpsertAsync(contexts.SelectMany(t => t.Conditions));
+                await _clientContextCache.UpdateContext(contexts);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When executing UpsertContext");
+                throw;
+            }
+            finally
+            {              
+                stopwatch.Stop();
+                _logger.LogInformation("UpsertContext ran for {time}", stopwatch.Elapsed);
+            }
         }
     }
 }

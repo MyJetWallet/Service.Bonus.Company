@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -138,21 +139,36 @@ namespace Service.BonusCampaign.Worker.Jobs
 
         private async Task<(List<ConditionBase>, List<ConditionBase>)> GetCondition(List<string> conditionIds, EventType eventType)
         {
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
-            var conditions = ctx.Conditions
-                .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                    && condition.Type == eventType.ToConditionType())
-                .Include(condition => condition.Rewards)
-                .ToList();
+                var conditions = ctx.Conditions
+                    .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                        && condition.Type == eventType.ToConditionType())
+                    .Include(condition => condition.Rewards)
+                    .ToList();
 
-            var afterConditions = ctx.Conditions
-                .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                    && condition.Type == ConditionType.ConditionsCondition)
-                .Include(condition => condition.Rewards)
-                .ToList();
+                var afterConditions = ctx.Conditions
+                    .Where(condition => conditionIds.Contains(condition.ConditionId)
+                                        && condition.Type == ConditionType.ConditionsCondition)
+                    .Include(condition => condition.Rewards)
+                    .ToList();
 
-            return (conditions, afterConditions);
+                return (conditions, afterConditions);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When executing GetCondition");
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogInformation("GetCampaignsWithoutThisClient ran for {time}", stopwatch.Elapsed);
+            }
         }
     }
 }
