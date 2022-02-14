@@ -48,7 +48,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When getting GetCampaignsWithoutThisClient for client {clientId}", clientId);
+                _logger.LogError(e, "When getting GetCampaignsWithoutThisClient for client {clientId}. Execution time {time}", clientId,  stopwatch.Elapsed);
                 throw;
             }
             finally
@@ -75,7 +75,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing GetCampaigns");
+                _logger.LogError(e, "When executing GetCampaigns. Execution time {time}", stopwatch.Elapsed);
                 throw;
             }
             finally
@@ -98,7 +98,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing SetActiveCampaigns");
+                _logger.LogError(e, "When executing SetActiveCampaigns. Execution time {time}", stopwatch.Elapsed);
                 throw;
             }
             finally
@@ -126,7 +126,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing SetFinishedCampaigns");
+                _logger.LogError(e, "When executing SetFinishedCampaigns. Execution time {time}", stopwatch.Elapsed);
                 throw;
             }
             finally

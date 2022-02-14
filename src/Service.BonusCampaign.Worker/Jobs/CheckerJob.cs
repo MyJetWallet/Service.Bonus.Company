@@ -161,7 +161,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing GetCondition");
+                _logger.LogError(e, "When executing GetCondition. Execution time {time}", stopwatch.Elapsed);
                 throw;
             }
             finally

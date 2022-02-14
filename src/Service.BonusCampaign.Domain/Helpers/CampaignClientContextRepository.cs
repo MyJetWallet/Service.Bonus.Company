@@ -50,7 +50,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing GetContextById for client {clientId}", clientId);
+                _logger.LogError(e, "When executing GetContextById for client {clientId}. Execution time {time}", clientId, stopwatch.Elapsed);
                 throw;
             }
             finally
@@ -73,7 +73,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "When executing UpsertContext");
+                _logger.LogError(e, "When executing UpsertContext. Execution time {time}", stopwatch.Elapsed);
                 throw;
             }
             finally
