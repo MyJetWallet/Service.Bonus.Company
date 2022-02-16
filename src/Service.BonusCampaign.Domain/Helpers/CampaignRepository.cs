@@ -33,17 +33,18 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
-
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
-                var campaigns = await ctx.CampaignClientContexts.Where(context => context.ClientId != clientId)
-                    .Select(t => t.CampaignId).ToListAsync();
-                
-                var ret = await ctx.Campaigns.Where(campaign =>
-                        campaign.Status == CampaignStatus.Active &&
-                        campaigns.Contains(campaign.Id))
+                var query = from campaign in ctx.Campaigns
+                    where campaign.Status == CampaignStatus.Active
+                    join context in ctx.CampaignClientContexts on campaign.Id equals context.CampaignId
+                    where context.ClientId != clientId
+                    select campaign;
+
+                var ret = await query
                     .Include(t => t.CriteriaList)
                     .Include(t => t.Conditions)
+                    .Distinct()
                     .ToListAsync();
                 
                 return ret;
@@ -142,12 +143,13 @@ namespace Service.BonusCampaign.Domain.Helpers
         {
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             var campaign = await ctx.Campaigns
+                .Where(t=>t.Id == campaignId)
                 .Include(t=>t.CriteriaList)
                 .Include(t=>t.Conditions)
                 .ThenInclude(t=>t.Rewards)
                 .Include(t=>t.CampaignClientContexts)
                 .ThenInclude(t=>t.Conditions)
-                .FirstOrDefaultAsync(t=>t.Id == campaignId);
+                .FirstOrDefaultAsync();
 
             await _contextCacheManager.UpdateContext(new List<Campaign>(){campaign});
             await _campaignWriter.InsertOrReplaceAsync(CampaignNoSqlEntity.Create(campaign));

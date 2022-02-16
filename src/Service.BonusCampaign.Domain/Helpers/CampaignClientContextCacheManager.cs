@@ -29,6 +29,17 @@ namespace Service.BonusCampaign.Domain.Helpers
             await _writer.CleanAndKeepMaxPartitions(10000);
         }
 
+        public async Task<List<CampaignClientContext>> GetContextsByClient(string clientId)
+        {
+            var entities = await _writer.GetAsync(CampaignClientContextNoSqlEntity.GeneratePartitionKey(clientId));
+            var campaignClientContextNoSqlEntities = entities.ToList();
+            if (campaignClientContextNoSqlEntities.Any())
+            {
+                return campaignClientContextNoSqlEntities.Select(t => t.Context).ToList();
+            }
+
+            return null;
+        }
         public async Task<List<CampaignClientContext>> GetActiveContextsByClient(List<string> activeCampaigns, string clientId)
         {
             var entities = await _writer.GetAsync(CampaignClientContextNoSqlEntity.GeneratePartitionKey(clientId));

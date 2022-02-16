@@ -30,10 +30,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             try
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-                var activeCampaigns = await ctx.Campaigns.Include(c=>c.Conditions).ThenInclude(t=>t.Rewards).Where(campaign=>campaign.Status== CampaignStatus.Active && campaign.CampaignClientContexts.Any(t=>t.ClientId == clientId)).ToListAsync();
-                var activeCampaignsIds = activeCampaigns.Select(t => t.Id).ToList();
-                
-                var cached = await _clientContextCache.GetActiveContextsByClient(activeCampaignsIds, clientId);
+                var cached = await _clientContextCache.GetContextsByClient(clientId);
                 if (cached != null)
                     return cached;
 
