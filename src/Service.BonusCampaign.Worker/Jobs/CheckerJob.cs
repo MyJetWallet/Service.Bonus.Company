@@ -103,8 +103,9 @@ namespace Service.BonusCampaign.Worker.Jobs
 
                 var conditionIds = contexts.SelectMany(t => t.Conditions.Select(state => state.ConditionId)).ToList();
 
-                var (conditions, afterConditions) = await GetCondition(conditionIds, update.EventType);
-                
+                var conditions = await GetCondition(conditionIds, update.EventType.ToConditionType());
+                var afterConditions = await GetCondition(conditionIds, ConditionType.ConditionsCondition);
+
                 foreach (var context in contexts)
                 {
                     foreach (var condition in conditions)
@@ -140,7 +141,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             }
         }
 
-        private async Task<(List<ConditionBase>, List<ConditionBase>)> GetCondition(List<string> conditionIds, EventType eventType)
+        private async Task<List<ConditionBase>> GetCondition(List<string> conditionIds, ConditionType conditionType)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -150,17 +151,11 @@ namespace Service.BonusCampaign.Worker.Jobs
 
                 var conditions = ctx.Conditions
                     .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                        && condition.Type == eventType.ToConditionType())
+                                        && condition.Type == conditionType)
                     .Include(condition => condition.Rewards)
                     .ToList();
 
-                var afterConditions = ctx.Conditions
-                    .Where(condition => conditionIds.Contains(condition.ConditionId)
-                                        && condition.Type == ConditionType.ConditionsCondition)
-                    .Include(condition => condition.Rewards)
-                    .ToList();
-
-                return (conditions, afterConditions);
+                return conditions;
             }
             catch (Exception e)
             {
