@@ -63,10 +63,10 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
+                await _clientContextCache.UpdateContext(contexts);
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 await ctx.UpsertAsync(contexts);
                 await ctx.UpsertAsync(contexts.SelectMany(t => t.Conditions));
-                await _clientContextCache.UpdateContext(contexts);
             }
             catch (Exception e)
             {
