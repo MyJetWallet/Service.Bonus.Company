@@ -35,16 +35,14 @@ namespace Service.BonusCampaign.Domain.Helpers
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
-                var query = from campaign in ctx.Campaigns
-                    where campaign.Status == CampaignStatus.Active
-                    join context in ctx.CampaignClientContexts on campaign.Id equals context.CampaignId
-                    where context.ClientId != clientId
-                    select campaign;
+                var campaigns = await ctx.CampaignClientContexts.Where(context => context.ClientId == clientId)
+                    .Select(t => t.CampaignId).Distinct().ToListAsync();
 
-                var ret = await query
+                var ret = await ctx.Campaigns.Where(campaign =>
+                    campaign.Status == CampaignStatus.Active &&
+                    !campaigns.Contains(campaign.Id))
                     .Include(t => t.CriteriaList)
                     .Include(t => t.Conditions)
-                    .Distinct()
                     .ToListAsync();
                 
                 return ret;

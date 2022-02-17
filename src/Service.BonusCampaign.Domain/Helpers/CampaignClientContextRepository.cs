@@ -29,11 +29,11 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 var cached = await _clientContextCache.GetContextsByClient(clientId);
                 if (cached != null)
                     return cached;
-
+                
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 var query =
                     from context in ctx.CampaignClientContexts
                     where context.ClientId == clientId
