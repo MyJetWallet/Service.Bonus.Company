@@ -87,7 +87,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             catch (Exception e)
             {
                 _logger.LogError(e, "When checking criteria for update {requestJson}", JsonSerializer.Serialize(update));
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
                 throw;
             }
         }
@@ -136,7 +136,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             {
                 _logger.LogError(e, "When checking conditions for update {requestJson}",
                     JsonSerializer.Serialize(update));
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
                 throw;
             }
         }
