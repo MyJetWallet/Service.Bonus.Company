@@ -223,7 +223,13 @@ namespace Service.BonusCampaign.Client
                         {
                             Brand = brand,
                             DeviceType = DeviceTypeEnum.Unknown
-                        });;;
+                        });
+                    case ActionEnum.EarnLanding:
+                        return _dynamicLinkClient.GenerateEarnLandingLink(new GenerateEarnLandingLinkRequest()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });
                     default:
                         return (String.Empty, String.Empty);
                 }
