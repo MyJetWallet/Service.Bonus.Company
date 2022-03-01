@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetWallet.DynamicLinkGenerator" Version="1.1.8" />
+    <PackageReference Include="MyJetWallet.DynamicLinkGenerator" Version="1.1.9" />
     <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.1.2" />
     <PackageReference Include="MyJetWallet.Service.BonusClientContext.Client" Version="1.0.6" />
     <PackageReference Include="MyJetWallet.Service.BonusRewards.Client" Version="1.0.5" />
