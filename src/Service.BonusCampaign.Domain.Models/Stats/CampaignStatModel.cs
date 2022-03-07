@@ -30,6 +30,7 @@ namespace Service.BonusCampaign.Domain.Models.Stats
         [DataMember(Order = 3)]public RewardStatModel Reward { get; set; }
         [DataMember(Order = 4)]public string DeepLink { get; set; }
         [DataMember(Order = 5)]public string DeepLinkWeb { get; set; }
+        [DataMember(Order = 6)]public int Weight { get; set; }
     }
     
     [DataContract]

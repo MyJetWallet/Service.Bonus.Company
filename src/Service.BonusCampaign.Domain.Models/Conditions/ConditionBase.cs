@@ -23,7 +23,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract ConditionStatus Status { get; set; }
         public abstract TimeSpan TimeToComplete { get; set; }
         public abstract ActionEnum Action { get; set; }
-        
+        public abstract int Weight { get; set; }
+
         
         public abstract Dictionary<string, string> GetParams();
         public abstract Task<ConditionStatus> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);

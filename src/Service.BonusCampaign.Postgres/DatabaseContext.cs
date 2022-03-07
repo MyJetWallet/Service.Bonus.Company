@@ -100,6 +100,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().Property(e => e.CampaignId).HasMaxLength(128);
             modelBuilder.Entity<ConditionBase>().Property(e => e.Parameters).HasColumnType("jsonb");
             modelBuilder.Entity<ConditionBase>().Property(e => e.Action).HasDefaultValue(ActionEnum.None);
+            modelBuilder.Entity<ConditionBase>().Property(e => e.Weight).HasDefaultValue(1);
 
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition)

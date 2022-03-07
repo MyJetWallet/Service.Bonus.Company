@@ -79,6 +79,7 @@ namespace Service.BonusCampaign.Client
                 var conditionStates = context.Conditions
                     .Where(t => t.Type != ConditionType.ConditionsCondition)
                     .Select(condition => GetConditionStat(condition, rewards))
+                    .OrderByDescending(t=>t.Weight)
                     .ToList();
 
                 var (longLink, shortLink) = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand);
@@ -124,6 +125,7 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
+                            Weight = condition.Weight
                         };
                     case ConditionType.TradeCondition:
                     {
@@ -157,6 +159,7 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
+                            Weight = condition.Weight
                         };
                     }
                     case ConditionType.DepositCondition:
@@ -168,6 +171,7 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
+                            Weight = condition.Weight
                         };
                     default:
                         return null;

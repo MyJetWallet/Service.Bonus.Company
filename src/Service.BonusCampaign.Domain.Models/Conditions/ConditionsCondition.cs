@@ -28,6 +28,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override ConditionStatus Status { get; set; }
         public override TimeSpan TimeToComplete { get; set; }
         public override ActionEnum Action { get; set; }
+        public override int Weight { get; set; }
 
         public ConditionsCondition()
         {

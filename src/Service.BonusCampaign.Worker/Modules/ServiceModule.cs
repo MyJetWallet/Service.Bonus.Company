@@ -24,15 +24,15 @@ namespace Service.BonusCampaign.Worker.Modules
                 ExecuteRewardMessage.TopicName, false);
 
             builder.RegisterMyNoSqlWriter<CampaignClientContextNoSqlEntity>(
-                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignClientContextNoSqlEntity.TableName);
+                () => Program.Settings.MyNoSqlWriterUrl, CampaignClientContextNoSqlEntity.TableName);
             
             builder.RegisterMyNoSqlWriter<CampaignsRegistryNoSqlEntity>(
-                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignsRegistryNoSqlEntity.TableName);
+                () => Program.Settings.MyNoSqlWriterUrl, CampaignsRegistryNoSqlEntity.TableName);
             
             builder.RegisterMyNoSqlWriter<CampaignNoSqlEntity>(
-                Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignNoSqlEntity.TableName);
+               () => Program.Settings.MyNoSqlWriterUrl, CampaignNoSqlEntity.TableName);
 
-            var myNoSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            var myNoSqlClient = builder.CreateNoSqlClient(() => Program.Settings.MyNoSqlReaderHostPort);
             builder.RegisterConvertIndexPricesClient(myNoSqlClient);
 
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
