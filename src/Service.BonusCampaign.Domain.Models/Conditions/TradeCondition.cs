@@ -35,7 +35,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public TradeCondition()
         {
         }
-        public TradeCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action)
+        public TradeCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
         {
             Type = ConditionType.TradeCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -47,6 +47,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Rewards = rewards;
             TimeToComplete = timeToComplete;
             Action = action;
+            Weight = weight;
 
             Init();
         }

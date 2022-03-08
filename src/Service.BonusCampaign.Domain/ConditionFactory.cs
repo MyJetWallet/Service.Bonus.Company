@@ -12,18 +12,18 @@ namespace Service.BonusCampaign.Domain
 {
     public static class ConditionFactory
     {
-        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete, ActionEnum action)
+        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
         {
             switch (type)
             {
                 case ConditionType.KYCCondition:
-                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
+                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
                 case ConditionType.TradeCondition:
-                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
+                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
                 case ConditionType.DepositCondition:
-                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
+                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
                 case ConditionType.ConditionsCondition:
-                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action);
+                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
                 case ConditionType.ReferralCondition:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

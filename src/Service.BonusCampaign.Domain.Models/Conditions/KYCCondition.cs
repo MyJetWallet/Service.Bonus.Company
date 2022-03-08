@@ -34,7 +34,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public KycCondition()
         {
         }
-        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action)
+        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
         {
             Type = ConditionType.KYCCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -46,6 +46,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Rewards = rewards;
             TimeToComplete = timeToComplete;
             Action = action;
+            Weight = weight;
 
             Init();
         }
