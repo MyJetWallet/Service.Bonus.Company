@@ -201,6 +201,12 @@ namespace Service.BonusCampaign.Services
             try
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var rewards = await ctx.Rewards.Where(t => t.ConditionId == request.ConditionId).ToListAsync();
+                if (rewards.Any())
+                {
+                    ctx.Rewards.RemoveRange(rewards);
+                    await ctx.SaveChangesAsync();
+                }
                 var condition = await ctx.Conditions.FirstOrDefaultAsync(t => t.ConditionId == request.ConditionId);
                 if (condition != null)
                 {
