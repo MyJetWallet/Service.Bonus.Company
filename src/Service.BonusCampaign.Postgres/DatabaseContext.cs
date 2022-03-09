@@ -77,6 +77,8 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<AccessCriteriaBase>().ToTable(CriteriaTableName);
             modelBuilder.Entity<AccessCriteriaBase>().HasKey(e => e.CriteriaId);
             modelBuilder.Entity<AccessCriteriaBase>().Property(e => e.Parameters).HasColumnType("jsonb");
+            modelBuilder.Entity<AccessCriteriaBase>().Property(e => e.LastUpdate).HasDefaultValue(DateTime.MinValue);
+
             modelBuilder.Entity<AccessCriteriaBase>().HasDiscriminator(e => e.CriteriaType)
                 .HasValue<KycCriteria>(CriteriaType.KycType)
                 .HasValue<ReferralCriteria>(CriteriaType.ReferralType)
@@ -101,6 +103,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().Property(e => e.Parameters).HasColumnType("jsonb");
             modelBuilder.Entity<ConditionBase>().Property(e => e.Action).HasDefaultValue(ActionEnum.None);
             modelBuilder.Entity<ConditionBase>().Property(e => e.Weight).HasDefaultValue(1);
+            modelBuilder.Entity<ConditionBase>().Property(e => e.LastUpdate).HasDefaultValue(DateTime.MinValue);
 
             modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition)
@@ -126,6 +129,7 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<RewardBase>().ToTable(RewardTableName);
             modelBuilder.Entity<RewardBase>().HasKey(e => e.RewardId);
             modelBuilder.Entity<RewardBase>().Property(e => e.Parameters).HasColumnType("jsonb");
+            modelBuilder.Entity<RewardBase>().Property(e => e.LastUpdate).HasDefaultValue(DateTime.MinValue);
 
             modelBuilder.Entity<RewardBase>().HasDiscriminator(e => e.Type)
                 .HasValue<FeeShareReward>(RewardType.FeeShareAssignment)

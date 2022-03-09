@@ -20,6 +20,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override Dictionary<string, string> Parameters { get; set; }
         public override string RewardId { get; set; }
         public override string ConditionId { get; set; }
+        public override DateTime LastUpdate { get; set; }
         public override RewardType Type { get; set; }
         
         public ClientPaymentReward(Dictionary<string, string> parameters, string rewardId, string conditionId)
@@ -28,6 +29,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
             ConditionId = conditionId;
             RewardId = rewardId ?? Guid.NewGuid().ToString("N");
             Parameters = parameters;
+            LastUpdate = DateTime.UtcNow;
         }
         
         public override Dictionary<string, string> GetParams() => Parameters;

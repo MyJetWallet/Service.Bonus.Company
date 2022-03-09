@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Service.BonusCampaign.Domain.Models.Enums;
@@ -10,6 +11,8 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public abstract string CriteriaId { get; set; }
         public abstract string CampaignId { get; set; }
         public abstract CriteriaType CriteriaType { get; set; }
+        public abstract DateTime LastUpdate { get; set; }
+
         public AccessCriteriaBase(Dictionary<string, string> parameters)
         {
         }

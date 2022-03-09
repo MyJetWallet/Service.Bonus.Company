@@ -30,6 +30,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override TimeSpan TimeToComplete { get; set; }
         public override ActionEnum Action { get; set; }
         public override int Weight { get; set; }
+        public override DateTime LastUpdate { get; set; }
 
         public KycCondition()
         {
@@ -48,6 +49,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Action = action;
             Weight = weight;
 
+            LastUpdate = DateTime.UtcNow;
+            
             Init();
         }
 

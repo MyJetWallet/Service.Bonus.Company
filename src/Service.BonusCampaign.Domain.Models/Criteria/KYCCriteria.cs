@@ -17,6 +17,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
+        public override DateTime LastUpdate { get; set; }
         public override Dictionary<string, string> Parameters { get; set; }
 
         public KycCriteria(Dictionary<string, string> parameters, string criteriaId, string campaignId) : base(
@@ -26,6 +27,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             CampaignId = campaignId;
             CriteriaType = CriteriaType.KycType;
             Parameters = parameters;
+            LastUpdate = DateTime.UtcNow;
             Init();
         }
 

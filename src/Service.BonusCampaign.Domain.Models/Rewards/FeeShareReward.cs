@@ -19,6 +19,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
         public override Dictionary<string, string> Parameters { get; set; }
         public override string RewardId { get; set; }
         public override string ConditionId { get; set; }
+        public override DateTime LastUpdate { get; set; }
         public override RewardType Type { get; set; }
         public override Dictionary<string, string> GetParams() => ParamDictionary;
 
@@ -30,7 +31,6 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
                 RewardType = RewardType.FeeShareAssignment.ToString(),
                 FeeShareGroup = Parameters[FeeShareGroup],
                 RewardId = RewardId,
-                //TODO: context и condition прокинуть
             });
             Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }
@@ -41,6 +41,7 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
             ConditionId = conditionId;
             RewardId = rewardId ?? Guid.NewGuid().ToString("N");
             Parameters = parameters;
+            LastUpdate = DateTime.UtcNow;
         }
     }
 }

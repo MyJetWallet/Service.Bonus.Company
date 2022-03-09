@@ -13,6 +13,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
+        public override DateTime LastUpdate { get; set; }
         public override Dictionary<string, string> Parameters { get; set; }
 
         public ReferralCriteria(Dictionary<string, string> parameters, string criteriaId, string campaignId) : base(parameters)
@@ -21,6 +22,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             CampaignId = campaignId;
             CriteriaType = CriteriaType.ReferralType;
             Parameters = parameters;
+            LastUpdate = DateTime.UtcNow;
             Init();
         }
 
