@@ -28,5 +28,11 @@ namespace Service.BonusCampaign.Grpc
         
         [OperationContract]
         Task<OperationResponse> UnblockUserInCampaign(BlockUserRequest request);
+        
+        [OperationContract]
+        Task<OperationResponse> RemoveReward(RemoveRewardRequest request);
+        
+        [OperationContract]
+        Task<OperationResponse> RemoveCondition(RemoveConditionRequest request);
     }
 }

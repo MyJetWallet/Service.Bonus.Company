@@ -17,6 +17,10 @@ namespace Service.BonusCampaign.Domain.Helpers
             _writer = writer;
         }
 
+        public async Task CleanCache()
+        {
+            await _writer.CleanAndKeepMaxPartitions(0);
+        }
         public async Task UpdateContext(List<CampaignClientContext> contexts)
         {
             await _writer.BulkInsertOrReplaceAsync(contexts.Select(CampaignClientContextNoSqlEntity.Create));

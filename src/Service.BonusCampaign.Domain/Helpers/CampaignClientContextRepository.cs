@@ -79,5 +79,10 @@ namespace Service.BonusCampaign.Domain.Helpers
                 _logger.LogInformation("UpsertContext ran for {time}", stopwatch.Elapsed);
             }
         }
+
+        public async Task CleanCache()
+        {
+            await _clientContextCache.CleanCache();
+        }
     }
 }

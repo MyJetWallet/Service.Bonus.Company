@@ -165,6 +165,70 @@ namespace Service.BonusCampaign.Services
             }
         }
 
+        public async Task<OperationResponse> RemoveReward(RemoveRewardRequest request)
+        {
+            _logger.LogInformation("Removing reward {rewardId}", request.RewardId);
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var reward = await ctx.Rewards.FirstOrDefaultAsync(t => t.RewardId == request.RewardId); 
+                if (reward != null)
+                {
+                    ctx.Rewards.Remove(reward);
+                    await ctx.SaveChangesAsync();
+
+                    var condition = await ctx.Conditions.FirstOrDefaultAsync(t => t.ConditionId == reward.ConditionId);
+                    if(condition != null)
+                        await _campaignRepository.RefreshCampaign(condition.CampaignId);
+
+                }
+                return new OperationResponse() { IsSuccess = true };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When removing reward {rewardId}", request.RewardId);
+                return new OperationResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }        
+        }
+
+        public async Task<OperationResponse> RemoveCondition(RemoveConditionRequest request)
+        {
+            _logger.LogInformation("Removing condition {conditionId}", request.ConditionId);
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                var condition = await ctx.Conditions.FirstOrDefaultAsync(t => t.ConditionId == request.ConditionId);
+                if (condition != null)
+                {
+                    ctx.Conditions.Remove(condition);
+                    await ctx.SaveChangesAsync();
+                    await _campaignRepository.RefreshCampaign(condition.CampaignId);
+                }
+                var states = await ctx.ClientConditionStates.Where(t => t.ConditionId == request.ConditionId)
+                    .ToListAsync();
+                if (states.Any())
+                {
+                    ctx.ClientConditionStates.RemoveRange(states);
+                    await ctx.SaveChangesAsync();
+                    await _contextRepository.CleanCache();
+                }
+                return new OperationResponse() { IsSuccess = true };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When removing condition {conditionId}", request.ConditionId);
+                return new OperationResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
         public async Task<OperationResponse> UnblockUserInCampaign(BlockUserRequest request)
         {
             _logger.LogInformation("Unblocking client {clientId} at campaign {campaignId}", request.ClientId, request.CampaignId);
