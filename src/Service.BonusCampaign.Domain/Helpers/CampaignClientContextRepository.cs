@@ -43,6 +43,8 @@ namespace Service.BonusCampaign.Domain.Helpers
                     select context;
 
                 var ret = await query.Include(t => t.Conditions).ToListAsync();
+
+                await _clientContextCache.UpdateContext(ret);
                 return ret;
             }
             catch (Exception e)
