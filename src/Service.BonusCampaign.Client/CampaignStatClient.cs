@@ -83,7 +83,9 @@ namespace Service.BonusCampaign.Client
             {
                 var campaign = campaignList.First(t => t.Id == context.CampaignId);
 
-                var conditionStates = (context.Conditions ?? new List<ConditionStateGrpcModel>())
+                context.Conditions ??= new List<ConditionStateGrpcModel>();
+                
+                var conditionStates = (context.Conditions)
                     .Where(t => t.Type != ConditionType.ConditionsCondition)
                     .Select(condition => GetConditionStat(condition, rewards))
                     .OrderByDescending(t=>t.Weight)
