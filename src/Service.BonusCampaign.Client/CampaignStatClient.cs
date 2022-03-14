@@ -51,7 +51,11 @@ namespace Service.BonusCampaign.Client
                     Campaigns = new List<CampaignStatModel>()
                 };
             }
-            var ids = campaignList.Where(e => e.Status== CampaignStatus.Active).Select(t => t.Id).ToList();
+            var ids = campaignList
+                .Where(e => e.Status== CampaignStatus.Active)
+                .Select(t => t.Id)
+                .ToList();
+            
             if (!ids.Any())
             {
                 return new CampaignStatsResponse
@@ -59,14 +63,17 @@ namespace Service.BonusCampaign.Client
                     Campaigns = new List<CampaignStatModel>()
                 };
             }
-            var contexts = clientContextList.Contexts.Where(t => ids.Contains(t.CampaignId)).ToList();
+            var contexts = clientContextList
+                .Contexts
+                .Where(t => ids.Contains(t.CampaignId))
+                .ToList();
 
             var conditions = campaignList
-                .SelectMany(t => t.Conditions)
+                .SelectMany(t => t.Conditions ?? new List<ConditionGrpcModel>())
                 .ToList();
 
             var rewards = conditions
-                .SelectMany(t => t.Rewards)
+                .SelectMany(t => t.Rewards ?? new List<RewardGrpcModel>())
                 .Where(t => t.Type == RewardType.ClientPaymentAbsolute)
                 .ToList();
 
@@ -76,7 +83,7 @@ namespace Service.BonusCampaign.Client
             {
                 var campaign = campaignList.First(t => t.Id == context.CampaignId);
 
-                var conditionStates = context.Conditions
+                var conditionStates = (context.Conditions ?? new List<ConditionStateGrpcModel>())
                     .Where(t => t.Type != ConditionType.ConditionsCondition)
                     .Select(condition => GetConditionStat(condition, rewards))
                     .OrderByDescending(t=>t.Weight)
