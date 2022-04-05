@@ -101,7 +101,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 Type = conditionState.Type,
                 Status = conditionState.Status,
                 ExpirationTime = conditionState.ExpirationTime,
-                Params = conditionState.Params
+                Params = conditionState.Params,
             };
         }
 
@@ -139,7 +139,8 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
                 Status = conditionBase.Status,
                 TimeToComplete = conditionBase.TimeToComplete,
                 Action = conditionBase.Action,
-                Weight = conditionBase.Weight
+                Weight = conditionBase.Weight,
+                TemplateId = conditionBase.DescriptionTemplateId
             };
         }
         
