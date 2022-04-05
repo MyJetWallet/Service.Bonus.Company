@@ -85,11 +85,16 @@ namespace Service.BonusCampaign.Client
 
                 context.Conditions ??= new List<ConditionStateGrpcModel>();
                 
-                var conditionStates = (context.Conditions)
+                var conditionStateGrpcModels = (context.Conditions)
                     .Where(t => t.Type != ConditionType.ConditionsCondition)
-                    .Select(condition => GetConditionStat(condition, rewards))
-                    .OrderByDescending(t=>t.Weight)
                     .ToList();
+
+                var conditionStates = new List<ConditionStatModel>();
+                foreach (var conditionStateGrpcModel in conditionStateGrpcModels)
+                {
+                    conditionStates.Add(await GetConditionStat(conditionStateGrpcModel, rewards));
+                }
+                conditionStates = conditionStates.OrderByDescending(t => t.Weight).ToList();
 
                 var (longLink, shortLink) = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand);
 
@@ -120,11 +125,13 @@ namespace Service.BonusCampaign.Client
             };
 
             //locals 
-            ConditionStatModel GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewardsList)
+            async Task<ConditionStatModel> GetConditionStat(ConditionStateGrpcModel state, List<RewardGrpcModel> rewardsList)
             {
                 var condition = conditions.First(t => t.ConditionId == state.ConditionId);
                 var (longLink, shortLink) = GenerateDeepLink(condition.Action, null, request.Brand);
 
+                var template = await _templateClient.GetTemplateBody(condition.TemplateId, request.Brand, request.Lang);
+                
                 switch (state.Type)
                 {
                     case ConditionType.KYCCondition:
@@ -137,16 +144,16 @@ namespace Service.BonusCampaign.Client
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
                             Weight = condition.Weight,
-                            Description = "Complete verification"
+                            Description = template
                         };
                     case ConditionType.TradeCondition:
                     {
-                        TradeParamsModel paramsModel;
+                        TradeParamsModel tradeParamsModel;
 
                         if (string.IsNullOrEmpty(state.Params))
                         {
                             var condParams = condition.Parameters;
-                            paramsModel = new TradeParamsModel
+                            tradeParamsModel = new TradeParamsModel
                             {
                                 TradeAmount = 0,
                                 RequiredAmount = decimal.Parse(condParams[TradeCondition.TradeAmountParam]),
@@ -155,7 +162,7 @@ namespace Service.BonusCampaign.Client
                         }
                         else
                         {
-                            paramsModel = JsonSerializer.Deserialize<TradeParamsModel>(state.Params);
+                            tradeParamsModel = JsonSerializer.Deserialize<TradeParamsModel>(state.Params);
                         }
 
                         return new ConditionStatModel
@@ -163,29 +170,48 @@ namespace Service.BonusCampaign.Client
                             Type = ConditionType.TradeCondition,
                             Params = new Dictionary<string, string>()
                             {
-                                { "Asset", paramsModel.TradeAsset },
-                                { "RequiredAmount", paramsModel.RequiredAmount.ToString() },
-                                { "TradedAmount", paramsModel.TradeAmount.ToString() },
+                                { "Asset", tradeParamsModel.TradeAsset },
+                                { "RequiredAmount", tradeParamsModel.RequiredAmount.ToString() },
+                                { "TradedAmount", tradeParamsModel.TradeAmount.ToString() },
                                 { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }
                             },
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
                             Weight = condition.Weight,
-                            Description = $"Trade volume ${paramsModel.RequiredAmount} ({paramsModel.TradeAmount}/{paramsModel.RequiredAmount})"
+                            Description = $"{template} ({tradeParamsModel.TradeAmount}/{tradeParamsModel.RequiredAmount})"
                         };
                     }
                     case ConditionType.DepositCondition:
+                        DepositParamsModel depositParamsModel;
+                        if (string.IsNullOrEmpty(state.Params))
+                        {
+                            var condParams = condition.Parameters;
+                            depositParamsModel = new DepositParamsModel()
+                            {
+                                DepositedAmount = 0,
+                                RequiredAmount = decimal.Parse(condParams[DepositCondition.DepositAmountParam]),
+                                DepositAsset = condParams[DepositCondition.DepositAssetParam]
+                            };
+                        }
+                        else
+                        {
+                            depositParamsModel = JsonSerializer.Deserialize<DepositParamsModel>(state.Params);
+                        }
                         return new ConditionStatModel
                         {
                             Type = ConditionType.DepositCondition,
                             Params = new Dictionary<string, string>()
-                                { { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower() } },
+                                {                                 
+                                    { "Asset", depositParamsModel.DepositAsset },
+                                    { "RequiredAmount", depositParamsModel.RequiredAmount.ToString() },
+                                    { "DepositedAmount", depositParamsModel.DepositedAmount.ToString() },
+                                    { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }},
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
                             Weight = condition.Weight,
-                            Description = "Deposit $500 total (315/500)"
+                            Description = $"{template} ({depositParamsModel.DepositedAmount}/{depositParamsModel.RequiredAmount})"
                         };
                     default:
                         return null;

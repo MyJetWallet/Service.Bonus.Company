@@ -31,11 +31,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override ActionEnum Action { get; set; }
         public override int Weight { get; set; }
         public override DateTime LastUpdate { get; set; }
+        public override string DescriptionTemplateId { get; set; }
 
         public KycCondition()
         {
         }
-        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
+        public KycCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight, string descriptionTemplateId)
         {
             Type = ConditionType.KYCCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -48,7 +49,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             TimeToComplete = timeToComplete;
             Action = action;
             Weight = weight;
-
+            DescriptionTemplateId = descriptionTemplateId;
+            
             LastUpdate = DateTime.UtcNow;
             
             Init();

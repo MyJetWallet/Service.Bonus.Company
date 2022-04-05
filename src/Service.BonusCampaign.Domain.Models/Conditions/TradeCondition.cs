@@ -32,11 +32,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override ActionEnum Action { get; set; }
         public override int Weight { get; set; }
         public override DateTime LastUpdate { get; set; }
+        public override string DescriptionTemplateId { get; set; }
 
         public TradeCondition()
         {
         }
-        public TradeCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
+        public TradeCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight, string descriptionTemplateId)
         {
             Type = ConditionType.TradeCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -49,7 +50,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             TimeToComplete = timeToComplete;
             Action = action;
             Weight = weight;
-
+            DescriptionTemplateId = descriptionTemplateId;
+            
             LastUpdate = DateTime.UtcNow;
             
             Init();
@@ -93,14 +95,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             Init();
             var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.TradeEvent.ToAssetId, _tradeAsset);
             
-            var model = string.IsNullOrWhiteSpace(paramsJson)
-                ? new TradeParamsModel
-                {
-                    TradeAmount = 0,
-                    RequiredAmount = _tradeAmount,
-                    TradeAsset = _tradeAsset
-                }
-                : JsonSerializer.Deserialize<TradeParamsModel>(paramsJson);
+            var model = JsonSerializer.Deserialize<TradeParamsModel>(paramsJson) ?? new TradeParamsModel
+            {
+                TradeAmount = 0,
+                RequiredAmount = _tradeAmount,
+                TradeAsset = _tradeAsset
+            };
             
             model.TradeAmount += context.TradeEvent.ToAmount * convertPrice.Price;
             return JsonSerializer.Serialize(model);

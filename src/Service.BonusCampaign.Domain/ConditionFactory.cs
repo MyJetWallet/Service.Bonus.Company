@@ -12,18 +12,18 @@ namespace Service.BonusCampaign.Domain
 {
     public static class ConditionFactory
     {
-        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
+        public static ConditionBase CreateCondition(ConditionType type, Dictionary<string, string> parameters, List<RewardBase> rewards, string campaignId, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight, string templateId)
         {
             switch (type)
             {
                 case ConditionType.KYCCondition:
-                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
+                    return new KycCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.TradeCondition:
-                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
+                    return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.DepositCondition:
-                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
+                    return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.ConditionsCondition:
-                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight);
+                    return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.ReferralCondition:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

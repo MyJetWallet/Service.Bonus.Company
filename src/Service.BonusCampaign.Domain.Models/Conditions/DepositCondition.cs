@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Context;
+using Service.BonusCampaign.Domain.Models.Context.ParamsModels;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
@@ -14,7 +16,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class DepositCondition : ConditionBase
     {
-        private const string DepositParam = "DepositMade";
+        public const string DepositAssetParam = "DepositAsset";
+        public const string DepositAmountParam = "DepositAmountInSelectedAsset";
+
+        private string _depositAsset;
+        private decimal _depositAmount;
+
         public override string ConditionId { get; set; }
         public override string CampaignId { get; set; }
         public override ConditionType Type { get; set; } = ConditionType.DepositCondition;
@@ -25,11 +32,12 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public override ActionEnum Action { get; set; }
         public override int Weight { get; set; }
         public override DateTime LastUpdate { get; set; }
+        public override string DescriptionTemplateId { get; set; }
 
         public DepositCondition()
         {
         }
-        public DepositCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight)
+        public DepositCondition(string campaignId, Dictionary<string, string> parameters, List<RewardBase> rewards, string conditionId, TimeSpan timeToComplete, ActionEnum action, int weight, string descriptionTemplateId)
         {
             Type = ConditionType.DepositCondition;
             ConditionId = conditionId ?? Guid.NewGuid().ToString("N");
@@ -42,8 +50,10 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             TimeToComplete = timeToComplete;
             Action = action;
             Weight = weight;
+            DescriptionTemplateId = descriptionTemplateId;
 
             LastUpdate = DateTime.UtcNow;
+            Init();
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -54,7 +64,18 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
             if (IsExpired(campaignContext.ActivationTime))
                 return ConditionStatus.Expired;
             
-            if (context.DepositEvent != null && context.DepositEvent.Amount > 0)
+            Init();
+            DepositParamsModel model;
+            try
+            {
+                model = JsonSerializer.Deserialize<DepositParamsModel>(paramsJson);
+            }
+            catch (JsonException e)
+            {
+                return ConditionStatus.NotMet;
+            }
+
+            if (model.DepositedAmount >= _depositAmount)
             {
                 foreach (var reward in Rewards)
                 {
@@ -62,16 +83,38 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
                 }
                 return ConditionStatus.Met;
             }
-            
             return ConditionStatus.NotMet;
         }
 
-        public override Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient) => Task.FromResult(paramsJson);
-
+        public override async Task<string> UpdateConditionStateParams(ContextUpdate context, string paramsJson, IConvertIndexPricesClient pricesClient)
+        {
+            Init();
+            var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.DepositEvent.AssetId, _depositAsset);
+            
+            var model = JsonSerializer.Deserialize<DepositParamsModel>(paramsJson) ?? new DepositParamsModel
+            {
+                DepositedAmount = 0,
+                RequiredAmount = _depositAmount,
+                DepositAsset = _depositAsset
+            };
+            
+            model.DepositedAmount += context.DepositEvent.Amount * convertPrice.Price;
+            return JsonSerializer.Serialize(model);
+        }
+        
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
-            { DepositParam, typeof(bool).ToString() },
+            { DepositAssetParam, typeof(string).ToString() },
+            { DepositAmountParam, typeof(decimal).ToString() },
         };
+        
+        private void Init()
+        {
+            if (!Parameters.TryGetValue(DepositAmountParam, out var amount) || !decimal.TryParse(amount, out _depositAmount) || !Parameters.TryGetValue(DepositAssetParam, out _depositAsset) || string.IsNullOrWhiteSpace(_depositAsset))
+            {
+                throw new Exception("Invalid arguments");
+            }
+        }
         
     }
 }

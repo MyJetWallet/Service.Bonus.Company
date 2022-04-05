@@ -25,6 +25,7 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         public abstract ActionEnum Action { get; set; }
         public abstract int Weight { get; set; }
         public abstract DateTime LastUpdate { get; set; }
+        public abstract string DescriptionTemplateId { get; set; }
 
         public abstract Dictionary<string, string> GetParams();
         public abstract Task<ConditionStatus> Check(ContextUpdate context, IServiceBusPublisher<ExecuteRewardMessage> publisher, string paramsJson, CampaignClientContext campaignContext);

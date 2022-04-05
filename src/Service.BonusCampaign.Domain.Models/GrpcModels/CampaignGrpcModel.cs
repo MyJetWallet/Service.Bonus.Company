@@ -54,7 +54,7 @@ namespace Service.BonusCampaign.Domain.Models.GrpcModels
         [DataMember(Order = 7)] public TimeSpan TimeToComplete { get; set; }
         [DataMember(Order = 8)] public ActionEnum Action { get; set; }
         [DataMember(Order = 9)] public int Weight { get; set; }
-
+        [DataMember(Order = 10)] public string TemplateId { get; set; }
     }
     
     [DataContract]
