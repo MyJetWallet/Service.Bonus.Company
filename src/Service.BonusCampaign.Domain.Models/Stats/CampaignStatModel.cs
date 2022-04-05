@@ -31,6 +31,7 @@ namespace Service.BonusCampaign.Domain.Models.Stats
         [DataMember(Order = 4)]public string DeepLink { get; set; }
         [DataMember(Order = 5)]public string DeepLinkWeb { get; set; }
         [DataMember(Order = 6)]public int Weight { get; set; }
+        [DataMember(Order = 7)]public string Description { get; set; }
     }
     
     [DataContract]

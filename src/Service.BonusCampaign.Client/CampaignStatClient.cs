@@ -92,12 +92,14 @@ namespace Service.BonusCampaign.Client
                     .ToList();
 
                 var (longLink, shortLink) = GenerateDeepLink(campaign.Action, campaign.SerializedRequest, request.Brand);
+
+                var campaignTitle = await _templateClient.GetTemplateBody(campaign.TitleTemplateId, request.Brand, request.Lang);
+                var campaignDescription = await _templateClient.GetTemplateBody(campaign.DescriptionTemplateId, request.Brand, request.Lang);
+                
                 var stat = new CampaignStatModel
                 {
-                    Title =
-                        await _templateClient.GetTemplateBody(campaign.TitleTemplateId, request.Brand, request.Lang),
-                    Description = await _templateClient.GetTemplateBody(campaign.DescriptionTemplateId, request.Brand,
-                        request.Lang),
+                    Title =campaignTitle,
+                    Description = campaignDescription,
                     ExpirationTime = GetExpirationTime(context.Conditions),
                     Conditions = conditionStates,
                     ImageUrl = campaign.ImageUrl,
@@ -134,7 +136,8 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
-                            Weight = condition.Weight
+                            Weight = condition.Weight,
+                            Description = "Complete verification"
                         };
                     case ConditionType.TradeCondition:
                     {
@@ -168,7 +171,8 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
-                            Weight = condition.Weight
+                            Weight = condition.Weight,
+                            Description = $"Trade volume ${paramsModel.RequiredAmount} ({paramsModel.TradeAmount}/{paramsModel.RequiredAmount})"
                         };
                     }
                     case ConditionType.DepositCondition:
@@ -180,7 +184,8 @@ namespace Service.BonusCampaign.Client
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
-                            Weight = condition.Weight
+                            Weight = condition.Weight,
+                            Description = "Deposit $500 total (315/500)"
                         };
                     default:
                         return null;
