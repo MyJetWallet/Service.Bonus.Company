@@ -39,6 +39,7 @@ namespace Service.BonusCampaign.Domain
                 case EventType.WithdrawalMade:
                     return ConditionType.WithdrawalCondition;
                 case EventType.ClientRegistered:
+                case EventType.ClientLoggedIn:
                 default:
                     return ConditionType.None;
             }

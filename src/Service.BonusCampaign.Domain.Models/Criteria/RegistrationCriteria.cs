@@ -32,12 +32,12 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         {
             Init();
             if (_countries.All(string.IsNullOrWhiteSpace))
-                return Task.FromResult(true);
+                return Task.FromResult(context.RegistrationDate >= LastUpdate);
             
             if(string.IsNullOrEmpty(context.Country))
                 return Task.FromResult(false);
 
-            return Task.FromResult(_countries.Contains(context.Country));
+            return Task.FromResult(_countries.Contains(context.Country) && context.RegistrationDate >= LastUpdate);
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;

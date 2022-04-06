@@ -42,6 +42,8 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
                 Asset = Parameters[PaidAsset],
                 AmountAbs = decimal.Parse(Parameters[AmountParam]),
                 RewardId = RewardId,
+                ReferralClientId = context.ClientId,
+                ReferrerClientId = context.Context.ReferrerClientId,
             });
             Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }

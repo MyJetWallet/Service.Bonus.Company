@@ -31,6 +31,8 @@ namespace Service.BonusCampaign.Domain.Models.Rewards
                 RewardType = RewardType.FeeShareAssignment.ToString(),
                 FeeShareGroup = Parameters[FeeShareGroup],
                 RewardId = RewardId,
+                ReferralClientId = !string.IsNullOrEmpty(context.Context.ReferrerClientId) ? context.ClientId : string.Empty,
+                ReferrerClientId = !string.IsNullOrEmpty(context.Context.ReferrerClientId) ? context.Context.ReferrerClientId : string.Empty,
             });
             Console.WriteLine($"Executing reward {Type} for user {context.ClientId}");
         }
