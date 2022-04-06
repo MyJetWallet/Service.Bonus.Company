@@ -130,7 +130,15 @@ namespace Service.BonusCampaign.Client
                 var condition = conditions.First(t => t.ConditionId == state.ConditionId);
                 var (longLink, shortLink) = GenerateDeepLink(condition.Action, null, request.Brand);
 
-                var template = await _templateClient.GetTemplateBody(condition.TemplateId, request.Brand, request.Lang);
+                var template = string.Empty;
+                try
+                {
+                    template = await _templateClient.GetTemplateBody(condition.TemplateId, request.Brand, request.Lang);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
                 
                 switch (state.Type)
                 {
