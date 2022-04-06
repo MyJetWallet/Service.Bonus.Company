@@ -139,7 +139,9 @@ namespace Service.BonusCampaign.Client
                 {
                     Console.WriteLine(e);
                 }
-                
+
+                string requiredAmount;
+                string amount;
                 switch (state.Type)
                 {
                     case ConditionType.KYCCondition:
@@ -173,21 +175,24 @@ namespace Service.BonusCampaign.Client
                             tradeParamsModel = JsonSerializer.Deserialize<TradeParamsModel>(state.Params);
                         }
 
+                        requiredAmount = Math.Round(tradeParamsModel.RequiredAmount, 0, MidpointRounding.ToZero).ToString();
+                        amount = Math.Round(tradeParamsModel.TradeAmount, 0, MidpointRounding.ToZero).ToString();
+                        
                         return new ConditionStatModel
                         {
                             Type = ConditionType.TradeCondition,
                             Params = new Dictionary<string, string>()
                             {
                                 { "Asset", tradeParamsModel.TradeAsset },
-                                { "RequiredAmount", tradeParamsModel.RequiredAmount.ToString() },
-                                { "TradedAmount", tradeParamsModel.TradeAmount.ToString() },
+                                { "RequiredAmount", requiredAmount},
+                                { "TradedAmount", amount },
                                 { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }
                             },
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
                             Weight = condition.Weight,
-                            Description = $"{template} ({tradeParamsModel.TradeAmount}/{tradeParamsModel.RequiredAmount})"
+                            Description = $"{template} ({amount}/{requiredAmount})"
                         };
                     }
                     case ConditionType.DepositCondition:
@@ -206,20 +211,24 @@ namespace Service.BonusCampaign.Client
                         {
                             depositParamsModel = JsonSerializer.Deserialize<DepositParamsModel>(state.Params);
                         }
+
+                        requiredAmount = Math.Round(depositParamsModel.RequiredAmount, 0, MidpointRounding.ToZero).ToString();
+                        amount = Math.Round(depositParamsModel.DepositedAmount, 0, MidpointRounding.ToZero).ToString();
+                        
                         return new ConditionStatModel
                         {
                             Type = ConditionType.DepositCondition,
                             Params = new Dictionary<string, string>()
                                 {                                 
                                     { "Asset", depositParamsModel.DepositAsset },
-                                    { "RequiredAmount", depositParamsModel.RequiredAmount.ToString() },
-                                    { "DepositedAmount", depositParamsModel.DepositedAmount.ToString() },
+                                    { "RequiredAmount", requiredAmount},
+                                    { "DepositedAmount", amount },
                                     { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }},
                             Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
                             DeepLink = shortLink,
                             DeepLinkWeb = longLink,
                             Weight = condition.Weight,
-                            Description = $"{template} ({depositParamsModel.DepositedAmount}/{depositParamsModel.RequiredAmount})"
+                            Description = $"{template} ({amount}/{requiredAmount})"
                         };
                     default:
                         return null;
