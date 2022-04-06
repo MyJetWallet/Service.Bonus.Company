@@ -90,14 +90,24 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             Init();
             var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.DepositEvent.AssetId, _depositAsset);
-            
-            var model = JsonSerializer.Deserialize<DepositParamsModel>(paramsJson) ?? new DepositParamsModel
+
+            var model = new DepositParamsModel
             {
                 DepositedAmount = 0,
                 RequiredAmount = _depositAmount,
                 DepositAsset = _depositAsset
             };
             
+            if (!string.IsNullOrWhiteSpace(paramsJson))
+            {
+                model = JsonSerializer.Deserialize<DepositParamsModel>(paramsJson) ?? new DepositParamsModel
+                {
+                    DepositedAmount = 0,
+                    RequiredAmount = _depositAmount,
+                    DepositAsset = _depositAsset
+                };
+            }
+
             model.DepositedAmount += context.DepositEvent.Amount * convertPrice.Price;
             return JsonSerializer.Serialize(model);
         }

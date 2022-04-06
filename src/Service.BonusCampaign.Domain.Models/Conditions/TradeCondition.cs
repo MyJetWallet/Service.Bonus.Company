@@ -94,14 +94,24 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
         {
             Init();
             var convertPrice = pricesClient.GetConvertIndexPriceByPairAsync(context.TradeEvent.ToAssetId, _tradeAsset);
-            
-            var model = JsonSerializer.Deserialize<TradeParamsModel>(paramsJson) ?? new TradeParamsModel
+           
+            var model =  new TradeParamsModel
             {
                 TradeAmount = 0,
                 RequiredAmount = _tradeAmount,
                 TradeAsset = _tradeAsset
             };
             
+            if (!string.IsNullOrWhiteSpace(paramsJson))
+            {
+                model = JsonSerializer.Deserialize<TradeParamsModel>(paramsJson) ?? new TradeParamsModel
+                {
+                    TradeAmount = 0,
+                    RequiredAmount = _tradeAmount,
+                    TradeAsset = _tradeAsset
+                };
+            }
+
             model.TradeAmount += context.TradeEvent.ToAmount * convertPrice.Price;
             return JsonSerializer.Serialize(model);
         }
