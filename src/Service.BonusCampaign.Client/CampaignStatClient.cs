@@ -286,7 +286,13 @@ namespace Service.BonusCampaign.Client
                             DeviceType = DeviceTypeEnum.Unknown
                         });
                     case ActionEnum.EarnLanding:
-                        return _dynamicLinkClient.GenerateEarnLandingLink(new GenerateEarnLandingLinkRequest()
+                        return _dynamicLinkClient.GenerateEarnLandingLink(new ()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });
+                    case ActionEnum.RecurringBuyStart:
+                        return _dynamicLinkClient.GenerateRecurringBuyLink(new ()
                         {
                             Brand = brand,
                             DeviceType = DeviceTypeEnum.Unknown
