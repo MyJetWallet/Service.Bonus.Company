@@ -9,6 +9,7 @@ namespace Service.BonusCampaign.Domain.Models
         public const string ReferAFriendBanner = "ReferAFriendBanner";
         
         public const string EarnProgram = "EarnProgram";
-
+        
+        public const string RecurringBuyBanner = "RecurringBuyBanner";
     }
 }
