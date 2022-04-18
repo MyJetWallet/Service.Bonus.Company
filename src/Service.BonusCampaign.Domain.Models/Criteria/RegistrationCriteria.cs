@@ -11,6 +11,8 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
     {
         private const string CountriesParam = "CountriesList";
         private List<string> _countries;
+        private const string DateParam = "DateParam";
+        private DateTime _startingDate;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
         public override CriteriaType CriteriaType { get; set; }
@@ -31,13 +33,20 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override Task<bool> Check(ClientContext context)
         {
             Init();
-            if (_countries.All(string.IsNullOrWhiteSpace))
-                return Task.FromResult(context.RegistrationDate >= LastUpdate);
-            
-            if(string.IsNullOrEmpty(context.Country))
-                return Task.FromResult(false);
+            return Task.FromResult(CheckCountry() && CheckDate());
 
-            return Task.FromResult(_countries.Contains(context.Country) && context.RegistrationDate >= LastUpdate);
+            //locals
+            bool CheckCountry()
+            {
+                return 
+                    !string.IsNullOrEmpty(context.Country) 
+                       && _countries.Contains(context.Country);
+            }
+
+            bool CheckDate()
+            {
+                return context.RegistrationDate >= _startingDate;
+            }
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
@@ -45,23 +54,42 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public static readonly Dictionary<string, string> ParamDictionary = new Dictionary<string, string>()
         {
             { CountriesParam, typeof(string).ToString() },
+            { DateParam, typeof(DateTime).ToString() },
+
         };
 
         private void Init()
         {
-            if (!Parameters.TryGetValue(CountriesParam, out var countriesString))
+            if (Parameters.TryGetValue(CountriesParam, out var countriesString))
+            {
+                try
+                {
+                    _countries = countriesString.Split(';').Select(t => t.Trim().ToUpper()).ToList();
+                }
+                catch
+                {
+                    throw new Exception("Invalid arguments");
+                }
+            }
+            else
             {
                 _countries = new List<string>();
-                return;
             }
 
-            try
+            if (Parameters.TryGetValue(DateParam, out var startingDateStr))
             {
-                _countries = countriesString.Split(';').Select(t=>t.Trim().ToUpper()).ToList();
+                try
+                {
+                    _startingDate = DateTime.Parse(startingDateStr);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Invalid arguments");
+                }
             }
-            catch
+            else
             {
-                throw new Exception("Invalid arguments");
+                _startingDate = DateTime.MinValue;
             }
         }
     }
