@@ -8,9 +8,9 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 {
     public class KycCriteria : AccessCriteriaBase
     {
-        private const string KycDepositParam = "KycDepositPassed";
-        private const string KycTradeParam = "KycTradePassed";
-        private const string KycWithdrawalParam = "KycWithdrawalPassed";
+        public const string KycDepositParam = "KycDepositPassed";
+        public const string KycTradeParam = "KycTradePassed";
+        public const string KycWithdrawalParam = "KycWithdrawalPassed";
         private bool _kycDepositStatus;
         private bool _kycTradeStatus;
         private bool _kycWithdrawalStatus;

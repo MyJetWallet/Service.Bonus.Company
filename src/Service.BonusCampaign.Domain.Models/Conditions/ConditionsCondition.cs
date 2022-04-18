@@ -15,8 +15,8 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class ConditionsCondition : ConditionBase
     {
-        private const string ConditionsParam = "ConditionsList";
-        private const string AllowExpiredParam = "AllowExpired";
+        public const string ConditionsParam = "ConditionsList";
+        public const string AllowExpiredParam = "AllowExpired";
 
         private List<string> _conditions;
         private bool _allowExpired;

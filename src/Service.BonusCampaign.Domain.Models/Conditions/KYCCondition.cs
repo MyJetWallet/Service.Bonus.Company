@@ -14,9 +14,9 @@ namespace Service.BonusCampaign.Domain.Models.Conditions
 {
     public class KycCondition : ConditionBase
     {
-        private const string KycDepositParam = "CheckDepositKyc";
-        private const string KycTradeParam = "CheckTradeKyc";
-        private const string KycWithdrawalParam = "CheckWithdrawalKyc";
+        public const string KycDepositParam = "CheckDepositKyc";
+        public const string KycTradeParam = "CheckTradeKyc";
+        public const string KycWithdrawalParam = "CheckWithdrawalKyc";
         private bool _kycDepositStatus;
         private bool _kycTradeStatus;
         private bool _kycWithdrawalStatus;

@@ -9,9 +9,9 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 {
     public class RegistrationCriteria : AccessCriteriaBase
     {
-        private const string CountriesParam = "CountriesList";
+        public const string CountriesParam = "CountriesList";
         private List<string> _countries;
-        private const string DateParam = "DateParam";
+        public const string DateParam = "DateParam";
         private DateTime _startingDate;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }

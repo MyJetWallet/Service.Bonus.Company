@@ -8,7 +8,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 {
     public class ReferralCriteria : AccessCriteriaBase
     {
-        private const string ReferrerParam = "HasReferrer";
+        public const string ReferrerParam = "HasReferrer";
         private bool _hasReferrer;
         public override string CriteriaId { get; set; }
         public override string CampaignId { get; set; }
