@@ -52,6 +52,9 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
                 if (_startingDate == DateTime.MinValue)
                     return true;
                 
+                if (context.RegistrationDate == DateTime.MinValue)
+                    return true;
+                
                 return context.RegistrationDate >= _startingDate;
             }
         }
@@ -71,7 +74,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             {
                 try
                 {
-                    _countries = countriesString.Split(';').Select(t => t.Trim().ToUpper()).ToList();
+                    _countries = countriesString.Split(';').Where(t=>!string.IsNullOrWhiteSpace(t)).Select(t => t.Trim().ToUpper()).ToList();
                 }
                 catch
                 {
