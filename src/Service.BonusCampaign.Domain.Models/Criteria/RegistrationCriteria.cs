@@ -38,13 +38,20 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
             //locals
             bool CheckCountry()
             {
-                return 
-                    !string.IsNullOrEmpty(context.Country) 
-                       && _countries.Contains(context.Country);
+                if (!_countries.Any())
+                    return true;
+
+                if (string.IsNullOrWhiteSpace(context.Country))
+                    return true;
+                
+                return _countries.Contains(context.Country);
             }
 
             bool CheckDate()
             {
+                if (_startingDate == DateTime.MinValue)
+                    return true;
+                
                 return context.RegistrationDate >= _startingDate;
             }
         }
