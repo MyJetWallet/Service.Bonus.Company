@@ -15,7 +15,7 @@ namespace Service.BonusCampaign.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            var noSqlClient = builder.CreateNoSqlClient(Program.Settings.MyNoSqlReaderHostPort, Program.LogFactory);
             builder.RegisterMyNoSqlWriter<CampaignClientContextNoSqlEntity>(
                 Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), CampaignClientContextNoSqlEntity.TableName);
             

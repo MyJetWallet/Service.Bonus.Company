@@ -32,7 +32,7 @@ namespace Service.BonusCampaign.Worker.Modules
             builder.RegisterMyNoSqlWriter<CampaignNoSqlEntity>(
                () => Program.Settings.MyNoSqlWriterUrl, CampaignNoSqlEntity.TableName);
 
-            var myNoSqlClient = builder.CreateNoSqlClient(() => Program.Settings.MyNoSqlReaderHostPort);
+            var myNoSqlClient = builder.CreateNoSqlClient(Program.Settings.MyNoSqlReaderHostPort, Program.LogFactory);
             builder.RegisterConvertIndexPricesClient(myNoSqlClient);
 
             builder.RegisterType<CampaignRepository>().AsSelf().SingleInstance();
