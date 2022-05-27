@@ -30,7 +30,7 @@ namespace Service.BonusCampaign.Worker.Jobs
             {
                 var campaigns = await _campaignRepository.GetCampaigns();
                 var activeCampaigns = campaigns.Where(t =>
-                    t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled).ToList();
+                    t.FromDateTime <= DateTime.UtcNow && t.ToDateTime > DateTime.UtcNow && t.IsEnabled && t.Status != CampaignStatus.Active).ToList();
                 foreach (var campaign in activeCampaigns)
                 {
                     campaign.Status = CampaignStatus.Active;
