@@ -92,7 +92,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
-                await _campaignWriter.CleanAndBulkInsertAsync(campaigns.Select(CampaignNoSqlEntity.Create));
+                await _campaignWriter.BulkInsertOrReplaceAsync(campaigns.Select(CampaignNoSqlEntity.Create));
                 await _contextCacheManager.UpdateContext(campaigns);
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 await ctx.UpsertAsync(campaigns);
@@ -115,6 +115,10 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
+                foreach (var campaign in campaigns)
+                {
+                    await _campaignWriter.DeleteAsync(CampaignNoSqlEntity.GeneratePartitionKey(), CampaignNoSqlEntity.GenerateRowKey(campaign.Id));
+                }
                 await _contextCacheManager.UpdateContext(campaigns);
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 await ctx.UpsertAsync(campaigns);

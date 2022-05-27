@@ -36,7 +36,8 @@ namespace Service.BonusCampaign.Worker.Jobs
                     campaign.Status = CampaignStatus.Active;
                 }
 
-                await _campaignRepository.SetActiveCampaigns(activeCampaigns);
+                if(activeCampaigns.Any())
+                    await _campaignRepository.SetActiveCampaigns(activeCampaigns);
 
                 var finishedCampaigns = campaigns
                     .Where(t => t.ToDateTime <= DateTime.UtcNow && t.Status != CampaignStatus.Finished).ToList();
@@ -44,8 +45,9 @@ namespace Service.BonusCampaign.Worker.Jobs
                 {
                     campaign.Status = CampaignStatus.Finished;
                 }
-
-                await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
+                
+                if(finishedCampaigns.Any())
+                    await _campaignRepository.SetFinishedCampaigns(finishedCampaigns);
             }
             catch (Exception e)
             {
