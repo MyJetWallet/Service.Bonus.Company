@@ -23,13 +23,13 @@ namespace Service.BonusCampaign.Domain.Helpers
         }
         public async Task UpdateContext(List<CampaignClientContext> contexts)
         {
-            await _writer.BulkInsertOrReplaceAsync(contexts.Select(CampaignClientContextNoSqlEntity.Create));
+            await _writer.BulkInsertOrReplaceAsync(contexts.Select(CampaignClientContextNoSqlEntity.Create).ToList());
             await _writer.CleanAndKeepMaxPartitions(10000);
         }
         
         public async Task UpdateContext(List<Campaign> campaigns)
         {
-            await _writer.BulkInsertOrReplaceAsync(campaigns.SelectMany(t => t.CampaignClientContexts).Select(CampaignClientContextNoSqlEntity.Create));
+            await _writer.BulkInsertOrReplaceAsync(campaigns.SelectMany(t => t.CampaignClientContexts).Select(CampaignClientContextNoSqlEntity.Create).ToList());
             await _writer.CleanAndKeepMaxPartitions(10000);
         }
 

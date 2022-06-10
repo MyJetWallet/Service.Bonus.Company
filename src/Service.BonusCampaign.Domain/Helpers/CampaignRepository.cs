@@ -92,7 +92,7 @@ namespace Service.BonusCampaign.Domain.Helpers
             stopwatch.Start();
             try
             {
-                await _campaignWriter.BulkInsertOrReplaceAsync(campaigns.Select(CampaignNoSqlEntity.Create));
+                await _campaignWriter.BulkInsertOrReplaceAsync(campaigns.Select(CampaignNoSqlEntity.Create).ToList());
                 await _contextCacheManager.UpdateContext(campaigns);
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 await ctx.UpsertAsync(campaigns);
