@@ -105,16 +105,19 @@ namespace Service.BonusCampaign.Postgres
             modelBuilder.Entity<ConditionBase>().Property(e => e.Weight).HasDefaultValue(1);
             modelBuilder.Entity<ConditionBase>().Property(e => e.LastUpdate).HasDefaultValue(DateTime.MinValue);
 
-            modelBuilder.Entity<ConditionBase>().HasDiscriminator(e => e.Type)
+            modelBuilder.Entity<ConditionBase>()
+                .HasDiscriminator(e => e.Type)
                 .HasValue<KycCondition>(ConditionType.KYCCondition)
                 .HasValue<TradeCondition>(ConditionType.TradeCondition)
                 .HasValue<DepositCondition>(ConditionType.DepositCondition)
-                .HasValue<ConditionsCondition>(ConditionType.ConditionsCondition);
+                .HasValue<ConditionsCondition>(ConditionType.ConditionsCondition)
+                .HasValue<FiatDepositCondition>(ConditionType.FiatDepositCondition);
             
             modelBuilder.Entity<KycCondition>().HasBaseType<ConditionBase>();
             modelBuilder.Entity<TradeCondition>().HasBaseType<ConditionBase>();
             modelBuilder.Entity<DepositCondition>().HasBaseType<ConditionBase>();
             modelBuilder.Entity<ConditionsCondition>().HasBaseType<ConditionBase>();
+            modelBuilder.Entity<FiatDepositCondition>().HasBaseType<ConditionBase>();
 
             modelBuilder.Entity<ConditionBase>().HasOne<Campaign>().WithMany(t => t.Conditions).HasForeignKey(t=>t.CampaignId);
 

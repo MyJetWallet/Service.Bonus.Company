@@ -22,6 +22,8 @@ namespace Service.BonusCampaign.Domain
                     return new TradeCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.DepositCondition:
                     return new DepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
+                case ConditionType.FiatDepositCondition:
+                    return new FiatDepositCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.ConditionsCondition:
                     return new ConditionsCondition(campaignId, parameters, rewards, conditionId, timeToComplete, action, weight, templateId);
                 case ConditionType.ReferralCondition:
@@ -38,6 +40,8 @@ namespace Service.BonusCampaign.Domain
                     return KycCondition.ParamDictionary;
                 case ConditionType.DepositCondition:
                     return DepositCondition.ParamDictionary;
+                case ConditionType.FiatDepositCondition:
+                    return FiatDepositCondition.ParamDictionary;
                 case ConditionType.TradeCondition:
                     return TradeCondition.ParamDictionary;
                 case ConditionType.ConditionsCondition:

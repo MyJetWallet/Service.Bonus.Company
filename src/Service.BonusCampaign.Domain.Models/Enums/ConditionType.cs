@@ -8,6 +8,7 @@ namespace Service.BonusCampaign.Domain.Models.Enums
         DepositCondition,
         WithdrawalCondition, 
         ConditionsCondition,
+        FiatDepositCondition,
         None = -1,
     }
 }

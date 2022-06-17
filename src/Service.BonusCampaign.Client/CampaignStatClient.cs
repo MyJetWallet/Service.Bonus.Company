@@ -230,6 +230,41 @@ namespace Service.BonusCampaign.Client
                             Weight = condition.Weight,
                             Description = $"{template} ({amount}/{requiredAmount})"
                         };
+                    case ConditionType.FiatDepositCondition:
+                        DepositParamsModel fiatDepositParamsModel;
+                        if (string.IsNullOrEmpty(state.Params))
+                        {
+                            var condParams = condition.Parameters;
+                            fiatDepositParamsModel = new DepositParamsModel()
+                            {
+                                DepositedAmount = 0,
+                                RequiredAmount = decimal.Parse(condParams[DepositCondition.DepositAmountParam]),
+                                DepositAsset = condParams[DepositCondition.DepositAssetParam]
+                            };
+                        }
+                        else
+                        {
+                            fiatDepositParamsModel = JsonSerializer.Deserialize<DepositParamsModel>(state.Params);
+                        }
+
+                        requiredAmount = Math.Round(fiatDepositParamsModel.RequiredAmount, 0, MidpointRounding.ToZero).ToString();
+                        amount = Math.Round(fiatDepositParamsModel.DepositedAmount, 0, MidpointRounding.ToZero).ToString();
+                        
+                        return new ConditionStatModel
+                        {
+                            Type = ConditionType.FiatDepositCondition,
+                            Params = new Dictionary<string, string>()
+                                {                                 
+                                    { "Asset", fiatDepositParamsModel.DepositAsset },
+                                    { "RequiredAmount", requiredAmount},
+                                    { "DepositedAmount", amount },
+                                    { "Passed", (state.Status == ConditionStatus.Met).ToString().ToLower()  }},
+                            Reward = GetRewardStat(rewardsList.FirstOrDefault(t => t.ConditionId == state.ConditionId)),
+                            DeepLink = shortLink,
+                            DeepLinkWeb = longLink,
+                            Weight = condition.Weight,
+                            Description = $"{template} ({amount}/{requiredAmount})"
+                        };
                     default:
                         return null;
                 }

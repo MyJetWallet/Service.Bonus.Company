@@ -17,6 +17,7 @@ namespace Service.BonusCampaign.Domain
                 case EventType.ReferrerAdded:
                     return CriteriaType.ReferralType;
                 case EventType.DepositMade:
+                case EventType.FiatDepositMade:
                 case EventType.TradeMade:
                 case EventType.WithdrawalMade:
                 default:
@@ -36,6 +37,8 @@ namespace Service.BonusCampaign.Domain
                     return ConditionType.TradeCondition;
                 case EventType.DepositMade:
                     return ConditionType.DepositCondition;
+                case EventType.FiatDepositMade:
+                    return ConditionType.FiatDepositCondition;
                 case EventType.WithdrawalMade:
                     return ConditionType.WithdrawalCondition;
                 case EventType.ClientRegistered:
