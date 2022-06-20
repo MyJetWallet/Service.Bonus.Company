@@ -8,6 +8,7 @@ using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
+using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.GrpcModels;
@@ -15,7 +16,6 @@ using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
 using Service.BonusCampaign.Postgres;
-using Service.BonusCampaign.Settings;
 
 namespace Service.BonusCampaign.Services
 {
@@ -227,6 +227,55 @@ namespace Service.BonusCampaign.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "When removing condition {conditionId}", request.ConditionId);
+                return new OperationResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
+        public async Task<OperationResponse> AddUserToCampaign(AddUserToCampaignRequest request)
+        {
+            _logger.LogInformation("Adding client {clientId} to campaign {campaignId}", request.ClientId,
+                request.CampaignId);
+            try
+            {
+                var contexts = new List<CampaignClientContext>();
+
+                var campaign = await _campaignRepository.GetCampaign(request.CampaignId);
+
+                if (campaign == null)
+                {
+                    return new OperationResponse()
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Campaign not found"
+                    };
+                }
+                
+                contexts.Add(new CampaignClientContext
+                {
+                    ClientId = request.ClientId,
+                    CampaignId = campaign.Id,
+                    ActivationTime = DateTime.UtcNow,
+                    Conditions = campaign.Conditions.Select(condition => new ClientConditionState
+                    {
+                        CampaignId = campaign.Id,
+                        ClientId = request.ClientId,
+                        ConditionId = condition.ConditionId,
+                        Type = condition.Type,
+                        Status = ConditionStatus.NotMet,
+                        ExpirationTime = DateTime.UtcNow + condition.TimeToComplete
+                    }).ToList()
+                });
+
+                await _contextRepository.UpsertContext(contexts);
+                return new OperationResponse() {IsSuccess = true};
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When adding client {clientId} to campaign {campaignId}", request.ClientId, request.CampaignId);
                 return new OperationResponse()
                 {
                     IsSuccess = false,

@@ -27,6 +27,35 @@ namespace Service.BonusCampaign.Domain.Helpers
             _logger = logger;
         }
 
+        
+        public async Task<Campaign> GetCampaign(string campaignId)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            try
+            {
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                
+                var ret = await ctx.Campaigns.Where(campaign =>
+                        campaign.Id == campaignId)
+                    .Include(t => t.CriteriaList)
+                    .Include(t => t.Conditions)
+                    .FirstOrDefaultAsync();
+                
+                return ret;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "When getting GetCampaign for client {campaignId}. Execution time {time}", campaignId,  stopwatch.Elapsed);
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogInformation("GetCampaign ran for {time}", stopwatch.Elapsed);
+            }
+        }
+        
         public async Task<List<Campaign>> GetCampaignsWithoutThisClient(string clientId)
         {
             var stopwatch = new Stopwatch();

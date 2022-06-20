@@ -34,5 +34,8 @@ namespace Service.BonusCampaign.Grpc
         
         [OperationContract]
         Task<OperationResponse> RemoveCondition(RemoveConditionRequest request);
+        
+        [OperationContract]
+        Task<OperationResponse> AddUserToCampaign(AddUserToCampaignRequest request);
     }
 }
