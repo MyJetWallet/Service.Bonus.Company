@@ -40,6 +40,7 @@ namespace Service.BonusCampaign.Domain.Helpers
                         campaign.Id == campaignId)
                     .Include(t => t.CriteriaList)
                     .Include(t => t.Conditions)
+                    .Include(t=>t.CampaignClientContexts)
                     .FirstOrDefaultAsync();
                 
                 return ret;

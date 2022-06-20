@@ -253,6 +253,13 @@ namespace Service.BonusCampaign.Services
                         ErrorMessage = "Campaign not found"
                     };
                 }
+
+                if (campaign.CampaignClientContexts.Any(t => t.ClientId == request.ClientId))
+                    return new OperationResponse()
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Client already in campaign"
+                    };
                 
                 contexts.Add(new CampaignClientContext
                 {
