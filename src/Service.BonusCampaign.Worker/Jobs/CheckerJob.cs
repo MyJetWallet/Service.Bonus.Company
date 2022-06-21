@@ -56,13 +56,14 @@ namespace Service.BonusCampaign.Worker.Jobs
 
                 foreach (var campaign in campaigns)
                 {
-                    var results = new List<bool>();
+                    var result = true;
                     foreach (var criteria in campaign.CriteriaList)
                     {
-                        results.Add(await criteria.Check(update.Context));
+                        var check = await criteria.Check(update.Context);
+                        result &= check;
                     }
 
-                    if (results.TrueForAll(t => t))
+                    if (result)
                     {
                         contexts.Add(new CampaignClientContext
                         {

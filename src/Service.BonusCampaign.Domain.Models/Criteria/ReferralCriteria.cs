@@ -44,10 +44,17 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
 
         private void Init()
         {
-            if (!Parameters.TryGetValue(ReferrerParam, out var hasReferral) || !bool.TryParse(hasReferral.ToLower(), out _hasReferrer))
+            if (!Parameters.TryGetValue(ReferrerParam, out var hasReferral))
             {
-                throw new Exception("Invalid arguments");
+                throw new Exception($"Invalid arguments - param {ReferrerParam} not found");
             }
+
+            if (!bool.TryParse(hasReferral.ToLower(), out var value))
+            {
+                throw new Exception($"Invalid arguments - param {ReferrerParam} has wrong value: {value}");
+            }
+
+            _hasReferrer = value;
         }
     }
 }

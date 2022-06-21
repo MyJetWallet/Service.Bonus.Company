@@ -42,7 +42,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
                     return true;
 
                 if (string.IsNullOrWhiteSpace(context.Country))
-                    return true;
+                    return false;
                 
                 return _countries.Contains(context.Country);
             }
@@ -53,7 +53,7 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
                     return true;
                 
                 if (context.RegistrationDate == DateTime.MinValue)
-                    return true;
+                    return false;
                 
                 return context.RegistrationDate >= _startingDate;
             }
