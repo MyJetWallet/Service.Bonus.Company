@@ -30,7 +30,9 @@ namespace Service.BonusCampaign.Domain.Models.Criteria
         public override Task<bool> Check(ClientContext context)
         {
             Init();
-            return Task.FromResult(string.IsNullOrWhiteSpace(context.ReferrerClientId) != _hasReferrer);
+            var hasReferrer = !string.IsNullOrWhiteSpace(context.ReferrerClientId);
+            var isValid = hasReferrer == _hasReferrer;
+            return Task.FromResult(isValid);
         }
 
         public override Dictionary<string, string> GetParams() => Parameters;
