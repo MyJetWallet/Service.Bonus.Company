@@ -6,24 +6,6 @@ namespace Service.BonusCampaign.Domain
 {
     public static class Extensions
     {
-        public static CriteriaType ToCriteriaType(this EventType type)
-        {
-            switch (type)
-            {
-                case EventType.ClientRegistered:
-                    return CriteriaType.RegistrationType;
-                case EventType.KYCPassed:
-                    return CriteriaType.KycType;
-                case EventType.ReferrerAdded:
-                    return CriteriaType.ReferralType;
-                case EventType.DepositMade:
-                case EventType.FiatDepositMade:
-                case EventType.TradeMade:
-                case EventType.WithdrawalMade:
-                default:
-                   return CriteriaType.None;
-            }
-        }
         
         public static ConditionType ToConditionType(this EventType type)
         {
@@ -31,8 +13,6 @@ namespace Service.BonusCampaign.Domain
             {
                 case EventType.KYCPassed:
                     return ConditionType.KYCCondition;
-                case EventType.ReferrerAdded:
-                    return ConditionType.ReferralCondition;
                 case EventType.TradeMade:
                     return ConditionType.TradeCondition;
                 case EventType.DepositMade:
@@ -42,7 +22,9 @@ namespace Service.BonusCampaign.Domain
                 case EventType.WithdrawalMade:
                     return ConditionType.WithdrawalCondition;
                 case EventType.ClientRegistered:
+                    return ConditionType.ReferralCondition;
                 case EventType.ClientLoggedIn:
+                case EventType.ReferrerAdded:
                 default:
                     return ConditionType.None;
             }

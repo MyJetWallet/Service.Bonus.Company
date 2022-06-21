@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
@@ -50,9 +51,12 @@ namespace Service.BonusCampaign.Worker.Jobs
         {
             try
             {
+                _logger.LogInformation("Got context update {update} for client {client} with type {type}", update.ToJson(), update.ClientId, update.EventType);
                 var contexts = new List<CampaignClientContext>();
 
                 var campaigns = await _campaignRepository.GetCampaignsWithoutThisClient(update.ClientId);
+
+                _logger.LogInformation("Client {client} can be added to campaigns {campaignList}", update.ClientId, campaigns.Select(t=>t.Id).ToJson());
 
                 foreach (var campaign in campaigns)
                 {
@@ -60,9 +64,11 @@ namespace Service.BonusCampaign.Worker.Jobs
                     foreach (var criteria in campaign.CriteriaList)
                     {
                         var check = await criteria.Check(update.Context);
+                        _logger.LogInformation("Client {client} passed criteria {criteria} ({type}) with result {result}", update.ClientId, criteria.CriteriaId, criteria.CriteriaType, check);
                         result &= check;
                     }
-
+                    _logger.LogInformation("Client {client}, campaign {campaing}: is added {result}", update.ClientId, campaign, result);
+                    
                     if (result)
                     {
                         contexts.Add(new CampaignClientContext
