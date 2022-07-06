@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using MyJetWallet.DynamicLinkGenerator.Models;
 using MyJetWallet.DynamicLinkGenerator.Services;
 using MyNoSqlServer.Abstractions;
 using Service.BonusCampaign.Domain.Models.Conditions;
-using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Context.ParamsModels;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.GrpcModels;
@@ -17,7 +15,6 @@ using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusCampaign.Domain.Models.Stats;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Grpc.Models;
-using Service.DynamicLinkGenerator.Domain.Models.Enums;
 using Service.MessageTemplates.Client;
 
 namespace Service.BonusCampaign.Client
@@ -328,6 +325,12 @@ namespace Service.BonusCampaign.Client
                         });
                     case ActionEnum.RecurringBuyStart:
                         return _dynamicLinkClient.GenerateRecurringBuyLink(new ()
+                        {
+                            Brand = brand,
+                            DeviceType = DeviceTypeEnum.Unknown
+                        });
+                    case ActionEnum.HighYield:
+                        return _dynamicLinkClient.GenerateHighYieldLink(new ()
                         {
                             Brand = brand,
                             DeviceType = DeviceTypeEnum.Unknown

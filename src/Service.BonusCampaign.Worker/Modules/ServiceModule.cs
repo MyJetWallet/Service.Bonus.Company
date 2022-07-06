@@ -2,7 +2,6 @@
 using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
-using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Worker.Jobs;

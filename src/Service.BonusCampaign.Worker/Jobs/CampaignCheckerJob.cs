@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
-using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.Enums;
 

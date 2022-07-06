@@ -1,5 +1,4 @@
 using System;
-using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models.Context

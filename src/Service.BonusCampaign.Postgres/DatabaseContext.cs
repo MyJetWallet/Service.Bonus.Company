@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using MyJetWallet.DynamicLinkGenerator.Models;
 using MyJetWallet.Sdk.Postgres;
 using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
@@ -11,7 +10,6 @@ using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
-using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Postgres
 {

@@ -1,9 +1,6 @@
 ﻿using Autofac;
-using Autofac.Core;
-using Autofac.Core.Registration;
 using MyJetWallet.DynamicLinkGenerator.Ioc;
 using MyJetWallet.Sdk.NoSql;
-using Service.BonusCampaign.Domain;
 using Service.BonusCampaign.Domain.Helpers;
 using Service.BonusCampaign.Domain.Models.NoSql;
 using Service.BonusCampaign.Services;

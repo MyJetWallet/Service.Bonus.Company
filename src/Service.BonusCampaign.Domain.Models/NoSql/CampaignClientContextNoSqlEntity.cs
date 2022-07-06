@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using MyNoSqlServer.Abstractions;
 using Service.BonusCampaign.Domain.Models.Context;
 

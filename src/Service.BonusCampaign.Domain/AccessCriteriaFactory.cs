@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Service.BonusCampaign.Domain.Models;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 

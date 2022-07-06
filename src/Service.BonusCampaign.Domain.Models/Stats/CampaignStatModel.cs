@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Service.BonusCampaign.Domain.Models.Enums;
-using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models.Stats
 {

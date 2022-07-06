@@ -1,4 +1,3 @@
-using System;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusClientContext.Domain.Models;
 

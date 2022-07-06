@@ -1,22 +1,14 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Autofac;
-using MyJetWallet.Sdk.GrpcMetrics;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
-using Prometheus;
-using ProtoBuf.Grpc.Server;
 using Service.BonusCampaign.Grpc;
 using Service.BonusCampaign.Modules;
 using Service.BonusCampaign.Postgres;
 using Service.BonusCampaign.Services;
-using SimpleTrading.BaseMetrics;
-using SimpleTrading.ServiceStatusReporterConnector;
 
 namespace Service.BonusCampaign
 {

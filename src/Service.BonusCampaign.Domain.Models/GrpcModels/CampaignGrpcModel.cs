@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using MyJetWallet.DynamicLinkGenerator.Models;
 using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Criteria;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
-using Service.DynamicLinkGenerator.Domain.Models.Enums;
 
 namespace Service.BonusCampaign.Domain.Models.GrpcModels
 {

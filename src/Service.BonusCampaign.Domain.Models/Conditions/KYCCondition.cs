@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyJetWallet.DynamicLinkGenerator.Models;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.BonusCampaign.Domain.Models.Context;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.Rewards;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;
-using Service.DynamicLinkGenerator.Domain.Models.Enums;
 using Service.IndexPrices.Client;
 
 namespace Service.BonusCampaign.Domain.Models.Conditions

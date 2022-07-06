@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyJetWallet.Sdk.ServiceBus;
-using Service.BonusCampaign.Domain.Models.Conditions;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusClientContext.Domain.Models;
 using Service.BonusRewards.Domain.Models;

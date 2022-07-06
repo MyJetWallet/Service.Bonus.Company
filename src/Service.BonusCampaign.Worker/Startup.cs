@@ -1,17 +1,11 @@
-﻿using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
-using Prometheus;
 using Service.BonusCampaign.Postgres;
 using Service.BonusCampaign.Worker.Modules;
-using SimpleTrading.ServiceStatusReporterConnector;
 
 namespace Service.BonusCampaign.Worker
 {
