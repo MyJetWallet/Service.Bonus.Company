@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using Service.BonusCampaign.Domain.Models.Enums;
 using Service.BonusCampaign.Domain.Models.GrpcModels;
 using Service.BonusCampaign.Grpc;
@@ -12,10 +14,11 @@ namespace Service.BonusCampaign.Services
     public class ClientContextService : IClientContextService
     {
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
-
-        public ClientContextService(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        private readonly ILogger<ClientContextService> _logger;
+        public ClientContextService(DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, ILogger<ClientContextService> logger)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            _logger = logger;
         }
 
         public async Task<GetContextsResponse> GetContextsByClient(GetContextsByClientRequest request)
@@ -39,6 +42,7 @@ namespace Service.BonusCampaign.Services
 
         public async Task<GetContextsResponse> GetActiveContextsByClient(GetContextsByClientRequest request)
         {
+            _logger.LogInformation("Got request for GetActiveContextsByClient with request {request}", request.ToJson());
             await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
             var contexts = ctx.CampaignClientContexts
                 .Where(t => t.ClientId == request.ClientId)
