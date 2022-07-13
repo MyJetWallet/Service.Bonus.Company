@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
     <PackageReference Include="MyJetWallet.DynamicLinkGenerator" Version="1.2.2" />
-    <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.2.8" />
+    <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.2.11" />
     <PackageReference Include="MyJetWallet.Service.MessageTemplates.Client" Version="1.1.0" />
     <PackageReference Include="protobuf-net.Grpc" Version="1.0.152" />
   </ItemGroup>
